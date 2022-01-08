@@ -1,23 +1,41 @@
 <script lang="ts">
 	import Row from '../components/Row.svelte';
 	import Keyboard from '../components/Keyboard.svelte';
+	import { onMount } from 'svelte';
 
-	const tiles = [0, 1, 2, 3, 4];
-	const rows = [0, 1, 2, 3, 4, 5];
+	let numberOfTiles = 5;
+	let numberOfRows = 6;
 
-	let inputRow = 0;
-	let inputTile = 0;
-	let entered = [
-		['', '', '', '', ''],
-		['', '', '', '', ''],
-		['', '', '', '', ''],
-		['', '', '', '', ''],
-		['', '', '', '', ''],
-		['', '', '', '', '']
-	];
+	let tiles = [];
+	let rows = [];
+
+	let currentRowIdx = 0;
+	let currentTileIdx = 0;
+	let entered = [];
 	let inputsDisabled = false;
 	let gameCompleted = false;
 	let rowCompleted = false;
+
+	function setupBoard() {
+		tiles = Array.from({ length: numberOfTiles }, (x, i) => i);
+		rows = Array.from({ length: numberOfRows }, (x, i) => i);
+
+		for (let i = 0; i < numberOfRows; i++) {
+			if (!entered[i]) {
+				entered[i] = [];
+			}
+			for (let j = 0; j < numberOfTiles; j++) {
+				if (entered[i][j]) {
+					entered[i][j] = [];
+				}
+				entered[i][j] = '';
+			}
+		}
+	}
+
+	onMount(() => {
+		setupBoard();
+	});
 
 	function handleTap(e) {
 		if (inputsDisabled) {
@@ -33,9 +51,9 @@
 		} else if (rowCompleted) {
 			if (e.detail === 'Enter') {
 				submitWord();
-				console.log(inputRow);
+				console.log(currentRowIdx);
 				startNewRow();
-				console.log(inputRow);
+				console.log(currentRowIdx);
 			} else if (e.detail == 'Back') {
 				deleteLastLetter();
 				rowCompleted = false;
@@ -55,7 +73,7 @@
 
 	function deleteLastLetter() {
 		if (!rowCompleted) {
-			inputTile--;
+			currentTileIdx--;
 		}
 		addInputToTile('');
 	}
@@ -66,7 +84,7 @@
 
 	function isAllowedToBackSpace() {
 		// Check if we are not at the first letter
-		return inputTile != 0;
+		return currentTileIdx != 0;
 	}
 
 	function isAllowedKey(key) {
@@ -74,31 +92,31 @@
 	}
 
 	function addInputToTile(letter) {
-		entered[inputRow][inputTile] = letter;
+		entered[currentRowIdx][currentTileIdx] = letter;
 	}
 
 	function submitWord() {
-		const submittedWord = entered[inputRow];
+		const submittedWord = entered[currentRowIdx];
 
 		console.log('submitted: ', submittedWord.join(''));
 	}
 
 	function isRowCompleted() {
-		return inputTile == 4;
+		return currentTileIdx == numberOfTiles - 1;
 	}
 
 	function isGameCompleted() {
-		return inputTile == 4 && inputRow == 5;
+		return currentTileIdx == numberOfTiles - 1 && currentRowIdx == numberOfRows - 1;
 	}
 
 	function startNewRow() {
 		rowCompleted = false;
-		inputRow++;
-		inputTile = 0;
+		currentRowIdx++;
+		currentTileIdx = 0;
 	}
 
 	function nextTile() {
-		inputTile++;
+		currentTileIdx++;
 	}
 
 	function updateGame() {
@@ -113,16 +131,23 @@
 			nextTile();
 		}
 	}
+
+	function changeLayout() {
+		numberOfTiles = 8;
+		numberOfRows = 8;
+		setupBoard();
+	}
 </script>
 
 <h1>Ordbord</h1>
 <main>
-	<div id="board" class="font-bold h-96 m-auto w-80 grid grid-rows-6 gap-0.5">
+	<div id="board" class="font-bold h-96 m-auto w-80 grid grid-rows-{numberOfRows} gap-0.5">
 		{#each rows as row}
 			<Row {tiles} {row} {entered} />
 		{/each}
 	</div>
 	<Keyboard on:tap={handleTap} />
+	<button on:click={changeLayout}>test</button>
 </main>
 
 <style>

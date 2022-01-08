@@ -6,7 +6,7 @@
 	export let entered: string[][];
 </script>
 
-<div id="row" class="grid grid-cols-5 gap-1">
+<div id="row" class="grid grid-cols-{tiles.length} gap-1">
 	{#each tiles as tile}
 		<Tile {tile} {row} {entered} />
 	{/each}
