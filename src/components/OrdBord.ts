@@ -3,15 +3,23 @@ interface Config {
 	rows: number;
 }
 
+interface ReturnData {
+	disableInputs: boolean;
+	updatedEntries: string[][];
+	gameCompleted: boolean;
+	rowCompleted: boolean;
+	rowSubmitted: boolean;
+}
+
 export class OrdBord {
 	numberOfTiles = 5;
 	numberOfRows = 6;
-
 	currentRowIdx = 0;
 	currentTileIdx = 0;
-	entered = [];
+	userEntries = [];
 	gameCompleted = false;
 	rowCompleted = false;
+
 	constructor(config: Config) {
 		this.numberOfTiles = config.tiles;
 		this.numberOfRows = config.rows;
@@ -19,16 +27,58 @@ export class OrdBord {
 		this.setupBoard();
 	}
 
+	handleTap(key: string): ReturnData {
+		const returnData = {
+			disableInputs: false,
+			updatedEntries: [],
+			gameCompleted: false,
+			rowCompleted: false,
+			rowSubmitted: false
+		};
+
+		if (this.gameCompleted) {
+			if (key === 'Enter') {
+				this.submitWord();
+				console.log('Thank you for playing!');
+
+				returnData.disableInputs = true;
+			}
+		} else if (this.rowCompleted) {
+			if (key === 'Enter') {
+				this.submitWord();
+
+				returnData.rowSubmitted = true;
+				this.startNewRow();
+			} else if (key == 'Back') {
+				this.deleteLastLetter();
+				this.rowCompleted = false;
+			}
+		} else {
+			// Continue adding / removing letters
+			if (this.isBackSpace(key) && this.isAllowedToBackSpace()) {
+				this.deleteLastLetter();
+			} else if (this.isAllowedKey(key)) {
+				this.addInputToTile(key);
+
+				this.updateGame();
+			}
+		}
+		returnData.updatedEntries = this.userEntries;
+		returnData.gameCompleted = this.gameCompleted;
+		returnData.rowCompleted = this.rowCompleted;
+		return returnData;
+	}
+
 	setupBoard(): void {
 		for (let i = 0; i < this.numberOfRows; i++) {
-			if (!this.entered[i]) {
-				this.entered[i] = [];
+			if (!this.userEntries[i]) {
+				this.userEntries[i] = [];
 			}
 			for (let j = 0; j < this.numberOfTiles; j++) {
-				if (this.entered[i][j]) {
-					this.entered[i][j] = [];
+				if (this.userEntries[i][j]) {
+					this.userEntries[i][j] = [];
 				}
-				this.entered[i][j] = '';
+				this.userEntries[i][j] = '';
 			}
 		}
 	}
@@ -54,11 +104,11 @@ export class OrdBord {
 	}
 
 	addInputToTile(letter: string): void {
-		this.entered[this.currentRowIdx][this.currentTileIdx] = letter;
+		this.userEntries[this.currentRowIdx][this.currentTileIdx] = letter;
 	}
 
 	submitWord(): void {
-		const submittedWord = this.entered[this.currentRowIdx];
+		const submittedWord = this.userEntries[this.currentRowIdx];
 
 		console.log('submitted: ', submittedWord.join(''));
 	}
@@ -94,11 +144,5 @@ export class OrdBord {
 			console.log('next tile');
 			this.nextTile();
 		}
-	}
-
-	changeLayout(): void {
-		this.numberOfTiles = 8;
-		this.numberOfRows = 8;
-		this.setupBoard();
 	}
 }
