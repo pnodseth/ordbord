@@ -35,7 +35,7 @@
 
 <h1>Ordbord</h1>
 <main>
-	<div id="board" class="font-bold h-96 m-auto w-80 grid grid-rows-{rows.length} gap-0.5">
+	<div id="board" class="font-bold h-96 m-auto w-80 grid grid-rows-{game.numberOfRows} gap-0.5">
 		{#each rows as row}
 			<Row {tiles} {row} entered={userEntries} />
 		{/each}
