@@ -16,14 +16,12 @@
 		if (inputsDisabled) {
 			return;
 		}
-		const { updatedBoardState, disableInputs, rowCompleted, rowSubmitted, gameCompleted } =
-			game.handleTap(e.detail);
+		const { updatedBoardState, disableInputs, rowSubmitted, gameCompleted } = game.handleTap(
+			e.detail
+		);
 		inputsDisabled = disableInputs;
 		boardState = updatedBoardState;
 
-		if (rowCompleted) {
-			console.log('I CAN HOOK INTO THIS!!!');
-		}
 		if (rowSubmitted) {
 			console.log('ROOOW WAS SUBMITTED');
 		}
