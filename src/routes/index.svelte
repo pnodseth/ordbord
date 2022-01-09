@@ -7,7 +7,7 @@
 	let rows;
 	let inputsDisabled = false;
 	let game = new OrdBord({ tiles: 5, rows: 6 });
-	let userEntries = game.userEntries;
+	let boardState = game.boardState;
 
 	tiles = Array.from({ length: game.numberOfTiles }, (x, i) => i);
 	rows = Array.from({ length: game.numberOfRows }, (x, i) => i);
@@ -16,10 +16,10 @@
 		if (inputsDisabled) {
 			return;
 		}
-		const { updatedEntries, disableInputs, rowCompleted, rowSubmitted, gameCompleted } =
+		const { updatedBoardState, disableInputs, rowCompleted, rowSubmitted, gameCompleted } =
 			game.handleTap(e.detail);
 		inputsDisabled = disableInputs;
-		userEntries = updatedEntries;
+		boardState = updatedBoardState;
 
 		if (rowCompleted) {
 			console.log('I CAN HOOK INTO THIS!!!');
@@ -37,7 +37,7 @@
 <main>
 	<div id="board" class="font-bold h-96 m-auto w-80 grid grid-rows-{game.numberOfRows} gap-0.5">
 		{#each rows as row}
-			<Row {tiles} {row} entered={userEntries} />
+			<Row {tiles} {row} entered={boardState} />
 		{/each}
 	</div>
 	<Keyboard on:tap={handleTap} />

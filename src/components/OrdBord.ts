@@ -5,7 +5,7 @@ interface Config {
 
 interface ReturnData {
 	disableInputs: boolean;
-	updatedEntries: string[][];
+	updatedBoardState: string[][];
 	gameCompleted: boolean;
 	rowCompleted: boolean;
 	rowSubmitted: boolean;
@@ -16,7 +16,7 @@ export class OrdBord {
 	numberOfRows = 6;
 	currentRowIdx = 0;
 	currentTileIdx = 0;
-	userEntries = [];
+	boardState = [];
 	gameCompleted = false;
 	rowCompleted = false;
 
@@ -30,7 +30,7 @@ export class OrdBord {
 	handleTap(key: string): ReturnData {
 		const returnData = {
 			disableInputs: false,
-			updatedEntries: [],
+			updatedBoardState: [],
 			gameCompleted: false,
 			rowCompleted: false,
 			rowSubmitted: false
@@ -63,7 +63,7 @@ export class OrdBord {
 				this.updateGame();
 			}
 		}
-		returnData.updatedEntries = this.userEntries;
+		returnData.updatedBoardState = this.boardState;
 		returnData.gameCompleted = this.gameCompleted;
 		returnData.rowCompleted = this.rowCompleted;
 		return returnData;
@@ -71,14 +71,14 @@ export class OrdBord {
 
 	setupBoard(): void {
 		for (let i = 0; i < this.numberOfRows; i++) {
-			if (!this.userEntries[i]) {
-				this.userEntries[i] = [];
+			if (!this.boardState[i]) {
+				this.boardState[i] = [];
 			}
 			for (let j = 0; j < this.numberOfTiles; j++) {
-				if (this.userEntries[i][j]) {
-					this.userEntries[i][j] = [];
+				if (this.boardState[i][j]) {
+					this.boardState[i][j] = [];
 				}
-				this.userEntries[i][j] = '';
+				this.boardState[i][j] = '';
 			}
 		}
 	}
@@ -104,11 +104,11 @@ export class OrdBord {
 	}
 
 	addInputToTile(letter: string): void {
-		this.userEntries[this.currentRowIdx][this.currentTileIdx] = letter;
+		this.boardState[this.currentRowIdx][this.currentTileIdx] = letter;
 	}
 
 	submitWord(): void {
-		const submittedWord = this.userEntries[this.currentRowIdx];
+		const submittedWord = this.boardState[this.currentRowIdx];
 
 		console.log('submitted: ', submittedWord.join(''));
 	}
