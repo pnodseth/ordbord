@@ -37,7 +37,7 @@ export class WordBoard {
 	private onInvalidWord: () => void = () =>
 		console.log('Not implemented. Register onInvalidWord handler with add registerEvents method');
 	private onValidWord: () => void = () =>
-		console.log('not implemented.Register onInvalidWord handler with add registerEvents method');
+		console.log('not implemented.Register onValidWord handler with add registerEvents method');
 	private onGameCompleted: () => void = () =>
 		console.log(
 			'not implemented.Register onGameCompleted event handler with add registerEvents method'
@@ -57,12 +57,15 @@ export class WordBoard {
 		this.setupBoard();
 	}
 
-	registerEvents(obj: RegisterEventsProps) {
+	registerEvents(obj: RegisterEventsProps): void {
 		if (typeof obj.onValidWord === 'function') {
 			this.onValidWord = obj.onValidWord;
 		}
 		if (typeof obj.onInvalidWord === 'function') {
 			this.onInvalidWord = obj.onInvalidWord;
+		}
+		if (typeof obj.onGameCompleted === 'function') {
+			this.onGameCompleted = obj.onGameCompleted;
 		}
 	}
 
@@ -76,7 +79,7 @@ export class WordBoard {
 		if (this.gameCompleted) {
 			if (key === 'Enter') {
 				this.submitWord();
-				console.log('Thank you for playing!');
+				this.onGameCompleted();
 			}
 		} else if (this.rowCompleted) {
 			if (key === 'Enter') {
@@ -87,14 +90,9 @@ export class WordBoard {
 					this.submitWord();
 					this.startNewRow();
 
-					if (typeof this.onValidWord === 'function') {
-						this.onValidWord();
-					}
+					this.onValidWord();
 				} else {
-					//todo: Add event onInvalidWord
-					if (this.onInvalidWord) {
-						this.onInvalidWord();
-					}
+					this.onInvalidWord();
 				}
 			} else if (key == 'Back') {
 				this.deleteLastLetter();
@@ -186,9 +184,7 @@ export class WordBoard {
 	private updateGame(): void {
 		if (this.isGameCompleted()) {
 			this.gameCompleted = true;
-			console.log('Game is completed');
 		} else if (this.isRowCompleted()) {
-			console.log('Row is completed');
 			this.rowCompleted = true;
 		} else {
 			this.nextTile();

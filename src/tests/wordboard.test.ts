@@ -11,7 +11,6 @@ test('Initial boardstate to be empty strings', () => {
 		expected.push(row);
 	}
 
-	console.log(expected);
 	expect(board.boardState.boardState).toEqual(expected);
 });
 
@@ -34,8 +33,6 @@ test('Adding q as first letter produces new board state', () => {
 		['', '', '', '', ''],
 		['', '', '', '', '']
 	];
-
-	console.log(board.boardState.boardState);
 
 	expect(board.boardState.boardState).toEqual(expected);
 });
@@ -117,6 +114,26 @@ test('Expect onValidWord event to be triggered after row complete', () => {
 	expect(eventString).toBe(expected);
 });
 
-/*test("Expect onInvalid event to be triggerd after submitting invalid word", () => {
+test('Expect onGameCompleted event to be triggered after row complete', () => {
+	const wordLength = 5;
+	const rows = 6;
+	const expected = 'game is now completed!';
+	let eventString = '';
 
-})*/
+	const board = new WordBoard({ rows, solution: 'jiras', tiles: wordLength });
+
+	board.registerEvents({
+		onGameCompleted: () => {
+			eventString = expected;
+		}
+	});
+
+	for (let i = 0; i < rows; i++) {
+		for (let j = 0; j < wordLength; j++) {
+			board.addLetter('q');
+		}
+		board.addLetter('Enter');
+	}
+
+	expect(eventString).toBe(expected);
+});

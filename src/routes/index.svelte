@@ -19,6 +19,9 @@
 		},
 		onValidWord: () => {
 			console.log('WORD WAS VALID! Submitted now');
+		},
+		onGameCompleted: () => {
+			console.log('GAME IS COMPLETE.. MUAAH');
 		}
 	});
 
