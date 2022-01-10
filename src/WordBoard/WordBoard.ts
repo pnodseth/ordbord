@@ -189,9 +189,7 @@ export class WordBoard {
 	}
 
 	private isGameCompleted(): boolean {
-		return (
-			this.currentTileIdx == this.numberOfTiles - 1 && this.currentRowIdx == this.numberOfRows - 1
-		);
+		return this.currentTileIdx == this.numberOfTiles && this.currentRowIdx == this.numberOfRows - 1;
 	}
 
 	private startNewRow(): void {

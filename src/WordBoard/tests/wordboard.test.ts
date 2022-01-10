@@ -39,6 +39,27 @@ test('Adding q as first letter produces new board state', () => {
 	expect(boardState).toEqual(expected);
 });
 
+test('Expect board to fill up with letters in all tiles', () => {
+	const wordLength = 5;
+	const rows = 6;
+
+	const board = new WordBoard({ rows, solution: 'jiras', tiles: wordLength });
+	const expected = [];
+
+	for (let i = 0; i < rows; i++) {
+		const arr = [];
+		for (let j = 0; j < wordLength; j++) {
+			arr.push('q');
+			board.addLetter('q');
+		}
+		board.addLetter('Enter');
+		expected.push(arr);
+	}
+
+	const { boardState } = board.getBoardState();
+	expect(boardState).toEqual(expected);
+});
+
 test('Enter should be disabled until end of row', () => {
 	const wordLength = 5;
 	const rows = 6;
