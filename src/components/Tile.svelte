@@ -2,8 +2,8 @@
 	export let tile: number;
 	export let row: number;
 	export let entered: string[][] = [];
-
 	export let tileText: string;
+	export let solution: string;
 
 	$: {
 		tileText = entered[row][tile];

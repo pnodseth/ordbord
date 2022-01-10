@@ -1,12 +1,22 @@
 <script lang="ts">
 	import Row from '../components/Row.svelte';
 	import Keyboard from '../components/Keyboard.svelte';
-	import { OrdBord } from '../components/OrdBord';
+	import { WordBoard } from '../components/WordBoard';
 
 	let tiles;
 	let rows;
 	let inputsDisabled = false;
-	let game = new OrdBord({ tiles: 5, rows: 6 });
+	const solution = 'pharm';
+	let game = new WordBoard({
+		tiles: 5,
+		rows: 6,
+		solution,
+		events: {
+			onInvalidWord: () => {
+				console.log('triggered invalid word');
+			}
+		}
+	});
 	let boardState = game.boardState;
 
 	tiles = Array.from({ length: game.numberOfTiles }, (x, i) => i);
@@ -16,10 +26,8 @@
 		if (inputsDisabled) {
 			return;
 		}
-		const { updatedBoardState, disableInputs, rowSubmitted, gameCompleted } = game.handleTap(
-			e.detail
-		);
-		inputsDisabled = disableInputs;
+		const { updatedBoardState, rowSubmitted, gameCompleted } = game.addLetter(e.detail);
+		console.log('updated: ', updatedBoardState);
 		boardState = updatedBoardState;
 
 		if (rowSubmitted) {
@@ -33,9 +41,9 @@
 
 <h1>Ordbord</h1>
 <main>
-	<div id="board" class="font-bold h-96 m-auto w-80 grid grid-rows-{game.numberOfRows} gap-0.5">
+	<div id="board" class="font-bold h-96 m-auto w-80 grid grid-rows-6 gap-0.5">
 		{#each rows as row}
-			<Row {tiles} {row} entered={boardState} />
+			<Row {tiles} {row} entered={boardState.boardState} />
 		{/each}
 	</div>
 	<Keyboard on:tap={handleTap} />
