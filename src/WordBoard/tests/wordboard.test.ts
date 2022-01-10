@@ -46,11 +46,12 @@ test('Expect board to fill up with letters in all tiles', () => {
 	const board = new WordBoard({ rows, solution: 'jiras', tiles: wordLength });
 	const expected = [];
 
+	const word = 'grine';
 	for (let i = 0; i < rows; i++) {
 		const arr = [];
 		for (let j = 0; j < wordLength; j++) {
-			arr.push('q');
-			board.addLetter('q');
+			arr.push(word[j]);
+			board.addLetter(word[j]);
 		}
 		board.addLetter('Enter');
 		expected.push(arr);
@@ -133,11 +134,11 @@ test('Expect first row to have submitted state after row complete', () => {
 	const rows = 6;
 	const board = new WordBoard({ rows, solution: 'jiras', tiles: wordLength });
 
-	board.addLetter('q');
-	board.addLetter('q');
-	board.addLetter('q');
-	board.addLetter('q');
-	board.addLetter('q');
+	board.addLetter('g');
+	board.addLetter('r');
+	board.addLetter('å');
+	board.addLetter('t');
+	board.addLetter('e');
 	board.addLetter('Enter');
 
 	const { submitted } = board.getBoardState();
@@ -152,17 +153,17 @@ test('Expect onValidWord event to be triggered after row complete', () => {
 	const expected = 'it works!';
 	let eventString = '';
 
-	const board = new WordBoard({ rows, solution: 'jiras', tiles: wordLength });
+	const board = new WordBoard({ rows, solution: 'gråte', tiles: wordLength });
 
 	board.registerEvents({
 		onValidWord: () => (eventString = expected)
 	});
 
-	board.addLetter('q');
-	board.addLetter('q');
-	board.addLetter('q');
-	board.addLetter('q');
-	board.addLetter('q');
+	board.addLetter('g');
+	board.addLetter('r');
+	board.addLetter('å');
+	board.addLetter('t');
+	board.addLetter('e');
 	board.addLetter('Enter');
 	expect(eventString).toBe(expected);
 });
@@ -180,10 +181,10 @@ test('Expect onGameCompleted event to be triggered after row complete', () => {
 			eventString = expected;
 		}
 	});
-
+	const word = 'gråte';
 	for (let i = 0; i < rows; i++) {
 		for (let j = 0; j < wordLength; j++) {
-			board.addLetter('q');
+			board.addLetter(word[j]);
 		}
 		board.addLetter('Enter');
 	}
@@ -206,11 +207,11 @@ test('Expect onGameCompleted event to NOT be triggered after row complete with w
 		}
 	});
 
-	board.addLetter('j');
-	board.addLetter('j');
-	board.addLetter('j');
-	board.addLetter('j');
-	board.addLetter('j');
+	board.addLetter('g');
+	board.addLetter('r');
+	board.addLetter('å');
+	board.addLetter('t');
+	board.addLetter('e');
 	board.addLetter('Enter');
 
 	expect(eventString).toEqual('');
@@ -219,8 +220,8 @@ test('Expect onGameCompleted event to NOT be triggered after row complete with w
 test('Expect valid row submission to produce array of correct letter indicators', () => {
 	const wordLength = 5;
 	const rows = 6;
-	const solution = 'prism';
-	const expected = ['present', 'correct', 'present', 'notPresent', 'correct'];
+	const solution = 'kajak';
+	const expected = ['correct', 'notPresent', 'present', 'notPresent', 'notPresent'];
 	let result;
 	const board = new WordBoard({ rows, solution, tiles: wordLength });
 	board.registerEvents({
@@ -228,11 +229,11 @@ test('Expect valid row submission to produce array of correct letter indicators'
 			result = r;
 		}
 	});
-	board.addLetter('i');
+	board.addLetter('k');
+	board.addLetter('l');
+	board.addLetter('a');
 	board.addLetter('r');
-	board.addLetter('p');
-	board.addLetter('f');
-	board.addLetter('m');
+	board.addLetter('e');
 	board.addLetter('Enter');
 
 	expect(result).toEqual(expected);
