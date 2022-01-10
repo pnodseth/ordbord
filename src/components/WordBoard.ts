@@ -11,32 +11,28 @@ interface BoardState {
 	submitted: boolean[];
 }
 
-interface ReturnData {
-	updatedBoardState: BoardState;
-	gameCompleted: boolean;
-	rowCompleted: boolean;
-}
-
 interface RegisterEventsProps {
-	onValidWord?: () => void;
+	onValidWord?: (result: LetterIndicator[]) => void;
 	onInvalidWord?: () => void;
 	onGameCompleted?: () => void;
 }
 
+export type LetterIndicator = 'notPresent' | 'present' | 'correct';
+
 export class WordBoard {
-	numberOfTiles = 5;
-	numberOfRows = 6;
-	currentRowIdx = 0;
-	currentTileIdx = 0;
-	boardState: BoardState = { boardState: [], submitted: [] };
-	gameCompleted = false;
-	rowCompleted = false;
+	private numberOfTiles = 5;
+	private numberOfRows = 6;
+	private currentRowIdx = 0;
+	private currentTileIdx = 0;
+	private boardState: BoardState = { boardState: [], submitted: [] };
+	private gameCompleted = false;
+	private rowCompleted = false;
 	SUBMIT_KEY = 'Enter';
 	BACKSPACE_KEY = 'Back';
-	solution = '';
+	private solution = '';
 	private onInvalidWord: () => void = () =>
 		console.log('Not implemented. Register onInvalidWord handler with add registerEvents method');
-	private onValidWord: () => void = () =>
+	private onValidWord: (result: LetterIndicator[]) => void = () =>
 		console.log('not implemented.Register onValidWord handler with add registerEvents method');
 	private onGameCompleted: () => void = () =>
 		console.log(
@@ -69,49 +65,43 @@ export class WordBoard {
 		}
 	}
 
-	addLetter(key: string): ReturnData {
-		const returnData = {
-			updatedBoardState: null,
-			gameCompleted: false,
-			rowCompleted: false
-		};
-
+	addLetter(key: string): BoardState {
 		if (this.gameCompleted) {
 			if (key === 'Enter') {
 				this.submitWord();
+				const indicators = this.getIndicatorsForCurrentRow();
+				this.onValidWord(indicators);
 				this.onGameCompleted();
 			}
 		} else if (this.rowCompleted) {
 			if (key === 'Enter') {
 				const word = this.boardState.boardState[this.currentRowIdx].join('');
-				const isValid = this.checkValidWord(word);
+				const isValid = WordBoard.checkValidWord(word);
 
 				if (isValid) {
 					this.submitWord();
-					this.startNewRow();
-
-					this.onValidWord();
+					const indicators = this.getIndicatorsForCurrentRow();
+					this.onValidWord(indicators);
 				} else {
 					this.onInvalidWord();
 				}
+				this.startNewRow();
 			} else if (key == 'Back') {
 				this.deleteLastLetter();
 				this.rowCompleted = false;
 			}
 		} else {
 			// Continue adding / removing letters
-			if (this.isBackSpace(key) && this.isAllowedToBackSpace()) {
+			if (WordBoard.isBackSpace(key) && this.isAllowedToBackSpace()) {
 				this.deleteLastLetter();
-			} else if (this.isAllowedKey(key)) {
+			} else if (WordBoard.isAllowedKey(key)) {
 				this.addInputToTile(key);
 
 				this.updateGame();
 			}
 		}
-		returnData.updatedBoardState = this.boardState;
-		returnData.gameCompleted = this.gameCompleted;
-		returnData.rowCompleted = this.rowCompleted;
-		return returnData;
+
+		return this.boardState;
 	}
 
 	private setupBoard(): void {
@@ -140,7 +130,7 @@ export class WordBoard {
 		this.addInputToTile('');
 	}
 
-	private isBackSpace(key: string): boolean {
+	private static isBackSpace(key: string): boolean {
 		return key == 'Back';
 	}
 
@@ -149,7 +139,7 @@ export class WordBoard {
 		return this.currentTileIdx != 0;
 	}
 
-	private isAllowedKey(key: string): boolean {
+	private static isAllowedKey(key: string): boolean {
 		return !(key == 'Enter' || key == 'Back');
 	}
 
@@ -191,7 +181,30 @@ export class WordBoard {
 		}
 	}
 
-	private checkValidWord(word: string) {
+	private static checkValidWord(word: string) {
 		return true;
+	}
+
+	private getIndicatorsForCurrentRow(): LetterIndicator[] {
+		const letterArr = this.boardState.boardState[this.currentRowIdx];
+
+		const result: LetterIndicator[] = [];
+
+		for (let i = 0; i < letterArr.length; i++) {
+			const char = letterArr[i];
+
+			if (char === this.solution[i]) {
+				result.push('correct');
+			} else if (this.solution.includes(char)) {
+				result.push('present');
+			} else {
+				result.push('notPresent');
+			}
+		}
+		return result;
+	}
+
+	getBoardState(): BoardState {
+		return this.boardState;
 	}
 }

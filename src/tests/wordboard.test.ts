@@ -10,16 +10,17 @@ test('Initial boardstate to be empty strings', () => {
 		const row = Array.from({ length: wordLength }, () => '');
 		expected.push(row);
 	}
-
-	expect(board.boardState.boardState).toEqual(expected);
+	const { boardState } = board.getBoardState();
+	expect(boardState).toEqual(expected);
 });
 
 test('Initial board state to have false submit checks', () => {
 	const wordLength = 7;
 	const board = new WordBoard({ rows: 6, solution: 'jirasas', tiles: wordLength });
 
+	const { submitted } = board.getBoardState();
 	const expected = Array.from({ length: wordLength }, () => false);
-	expect(board.boardState.submitted).toEqual(expected);
+	expect(submitted).toEqual(expected);
 });
 
 test('Adding q as first letter produces new board state', () => {
@@ -34,7 +35,8 @@ test('Adding q as first letter produces new board state', () => {
 		['', '', '', '', '']
 	];
 
-	expect(board.boardState.boardState).toEqual(expected);
+	const { boardState } = board.getBoardState();
+	expect(boardState).toEqual(expected);
 });
 
 test('Enter should be disabled until end of row', () => {
@@ -43,7 +45,7 @@ test('Enter should be disabled until end of row', () => {
 	const board = new WordBoard({ rows, solution: 'jiras', tiles: wordLength });
 
 	board.addLetter('q');
-	const { updatedBoardState } = board.addLetter('Enter');
+	const { boardState } = board.addLetter('Enter');
 
 	const expected = [
 		['q', '', '', '', ''],
@@ -54,7 +56,7 @@ test('Enter should be disabled until end of row', () => {
 		['', '', '', '', '']
 	];
 
-	expect(updatedBoardState.boardState).toEqual(expected);
+	expect(boardState).toEqual(expected);
 });
 
 test('Back should remove previously added letter', () => {
@@ -63,7 +65,7 @@ test('Back should remove previously added letter', () => {
 	const board = new WordBoard({ rows, solution: 'jiras', tiles: wordLength });
 
 	board.addLetter('q');
-	const { updatedBoardState } = board.addLetter('Back');
+	const { boardState } = board.addLetter('Back');
 
 	const expected = [
 		['', '', '', '', ''],
@@ -74,7 +76,7 @@ test('Back should remove previously added letter', () => {
 		['', '', '', '', '']
 	];
 
-	expect(updatedBoardState.boardState).toEqual(expected);
+	expect(boardState).toEqual(expected);
 });
 
 test('Expect first row to have submitted state after row complete', () => {
@@ -87,10 +89,10 @@ test('Expect first row to have submitted state after row complete', () => {
 	board.addLetter('q');
 	board.addLetter('q');
 	board.addLetter('q');
-	const { updatedBoardState } = board.addLetter('Enter');
+	const { submitted } = board.addLetter('Enter');
 
 	const expected = [true, false, false, false, false];
-	expect(updatedBoardState.submitted).toEqual(expected);
+	expect(submitted).toEqual(expected);
 });
 
 test('Expect onValidWord event to be triggered after row complete', () => {
@@ -136,4 +138,26 @@ test('Expect onGameCompleted event to be triggered after row complete', () => {
 	}
 
 	expect(eventString).toBe(expected);
+});
+
+test('Expect valid row submission to produce array of correct letter indicators', () => {
+	const wordLength = 5;
+	const rows = 6;
+	const solution = 'prism';
+	const expected = ['present', 'correct', 'present', 'notPresent', 'correct'];
+	let result;
+	const board = new WordBoard({ rows, solution, tiles: wordLength });
+	board.registerEvents({
+		onValidWord: (r) => {
+			result = r;
+		}
+	});
+	board.addLetter('i');
+	board.addLetter('r');
+	board.addLetter('p');
+	board.addLetter('f');
+	board.addLetter('m');
+	board.addLetter('Enter');
+
+	expect(result).toEqual(expected);
 });

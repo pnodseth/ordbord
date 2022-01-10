@@ -1,23 +1,29 @@
 <script lang="ts">
 	import Row from '../components/Row.svelte';
 	import Keyboard from '../components/Keyboard.svelte';
-	import { WordBoard } from '../components/WordBoard';
+	import { LetterIndicator, WordBoard } from '../components/WordBoard';
 
-	let tiles;
-	let rows;
+	let tilesArr;
+	let rowsArr;
+	let rowsCount = 6;
 	let inputsDisabled = false;
+	let indicators: LetterIndicator[][] = [];
+
 	const solution = 'pharm';
 	let game = new WordBoard({
-		tiles: 5,
-		rows: 6,
+		tiles: solution.length,
+		rows: rowsCount,
 		solution
 	});
-	let boardState = game.boardState;
+	let boardState = game.getBoardState();
+
 	game.registerEvents({
 		onInvalidWord: () => {
 			console.log('triggered invalid word');
 		},
-		onValidWord: () => {
+		onValidWord: (result) => {
+			indicators.push(result);
+			console.log('indicators: ', result);
 			console.log('WORD WAS VALID! Submitted now');
 		},
 		onGameCompleted: () => {
@@ -25,28 +31,28 @@
 		}
 	});
 
-	tiles = Array.from({ length: game.numberOfTiles }, (x, i) => i);
-	rows = Array.from({ length: game.numberOfRows }, (x, i) => i);
+	tilesArr = Array.from({ length: solution.length }, (x, i) => i);
+	rowsArr = Array.from({ length: rowsCount }, (x, i) => i);
 
 	function handleTap(e) {
 		if (inputsDisabled) {
 			return;
 		}
-		const { updatedBoardState, gameCompleted } = game.addLetter(e.detail);
-		console.log('updated: ', updatedBoardState);
-		boardState = updatedBoardState;
-
-		if (gameCompleted) {
-			console.log('game completed!!!');
-		}
+		boardState = game.addLetter(e.detail);
 	}
 </script>
 
 <h1>Ordbord</h1>
 <main>
 	<div id="board" class="font-bold h-96 m-auto w-80 grid grid-rows-6 gap-0.5">
-		{#each rows as row}
-			<Row {tiles} {row} entered={boardState.boardState} />
+		{#each rowsArr as row}
+			<Row
+				tiles={tilesArr}
+				{row}
+				entered={boardState.boardState}
+				submissions={boardState.submitted}
+				{indicators}
+			/>
 		{/each}
 	</div>
 	<Keyboard on:tap={handleTap} />
