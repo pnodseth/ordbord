@@ -27,7 +27,7 @@
 		{#each ['z', 'x', 'c', 'v', 'b', 'n', 'm'] as key}
 			<Key {key} on:click={() => handleTap(key)} />
 		{/each}
-		<Key key="Back" on:click={() => handleTap('Back')} />
+		<Key key="Backspace" on:click={() => handleTap('Backspace')} />
 	</div>
 </div>
 

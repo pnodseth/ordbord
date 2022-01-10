@@ -1,23 +1,4 @@
-interface Config {
-	tiles: number;
-	rows: number;
-	submitKey?: string;
-	backKey?: string;
-	solution: string;
-}
-
-interface BoardState {
-	boardState: string[][];
-	submitted: boolean[];
-}
-
-interface RegisterEventsProps {
-	onValidWord?: (result: LetterIndicator[]) => void;
-	onInvalidWord?: () => void;
-	onGameCompleted?: (correct: boolean) => void;
-}
-
-export type LetterIndicator = 'notPresent' | 'present' | 'correct';
+import type { BoardState, Config, LetterIndicator, RegisterEventsProps } from './interface';
 
 export class WordBoard {
 	private numberOfTiles = 5;
@@ -25,12 +6,10 @@ export class WordBoard {
 	private currentRowIdx = 0;
 	private currentTileIdx = 0;
 	private boardState: BoardState = { boardState: [], submitted: [] };
-	private gameCompleted = false;
-	private rowCompleted = false;
-	private solution = '';
+	private solutionWord = '';
 	private gameEnded = false;
 	SUBMIT_KEY = 'Enter';
-	BACKSPACE_KEY = 'Back';
+	BACKSPACE_KEY = 'Backspace';
 
 	private onInvalidWord: () => void = () =>
 		console.log('Not implemented. Register onInvalidWord handler with add registerEvents method');
@@ -46,7 +25,7 @@ export class WordBoard {
 		this.numberOfRows = config.rows;
 		if (config.submitKey) this.SUBMIT_KEY = config.submitKey;
 		if (config.backKey) this.BACKSPACE_KEY = config.backKey;
-		this.solution = config.solution;
+		this.solutionWord = config.solution;
 
 		if (config.solution.length !== config.tiles) {
 			throw Error('Solution word must have same amount of characters as config.');
@@ -68,9 +47,14 @@ export class WordBoard {
 	}
 
 	addLetter(key: string): BoardState | undefined {
+		if (!this.isAllowedKey(key)) {
+			return;
+		}
 		if (this.gameEnded) {
 			return;
-		} else if (this.gameCompleted) {
+
+			// Game Completed
+		} else if (this.isGameCompleted()) {
 			if (key === 'Enter') {
 				this.submitWord();
 				const indicators = this.getIndicatorsForCurrentRow();
@@ -78,10 +62,10 @@ export class WordBoard {
 				this.onGameCompleted(WordBoard.isCorrectAnswer(indicators));
 				this.gameEnded = true;
 			}
-		} else if (this.rowCompleted) {
+		} else if (this.isRowCompleted()) {
 			if (key === 'Enter') {
 				const word = this.boardState.boardState[this.currentRowIdx].join('');
-				const isValid = WordBoard.checkValidWord(word);
+				const isValid = this.checkValidWord(word);
 
 				if (isValid) {
 					this.submitWord();
@@ -97,15 +81,15 @@ export class WordBoard {
 					this.onInvalidWord();
 				}
 				this.startNewRow();
-			} else if (key == 'Back') {
+			} else if (key == this.BACKSPACE_KEY) {
+				console.log('hi');
 				this.deleteLastLetter();
-				this.rowCompleted = false;
 			}
 		} else {
 			// Continue adding / removing letters
-			if (WordBoard.isBackSpace(key) && this.isAllowedToBackSpace()) {
+			if (key === this.BACKSPACE_KEY && this.isAllowedToBackSpace()) {
 				this.deleteLastLetter();
-			} else if (WordBoard.isAllowedKey(key)) {
+			} else if (this.isInputKey(key)) {
 				this.addInputToTile(key);
 
 				this.updateGame();
@@ -139,14 +123,8 @@ export class WordBoard {
 	}
 
 	private deleteLastLetter(): void {
-		if (!this.rowCompleted) {
-			this.currentTileIdx--;
-		}
+		this.currentTileIdx--;
 		this.addInputToTile('');
-	}
-
-	private static isBackSpace(key: string): boolean {
-		return key == 'Back';
 	}
 
 	private isAllowedToBackSpace(): boolean {
@@ -154,8 +132,75 @@ export class WordBoard {
 		return this.currentTileIdx != 0;
 	}
 
-	private static isAllowedKey(key: string): boolean {
-		return !(key == 'Enter' || key == 'Back');
+	private isInputKey(key) {
+		return this.getInputKeys().includes(key);
+	}
+
+	private getInputKeys() {
+		const norwegian = ['æ', 'ø', 'å'];
+		const english = [
+			'q',
+			'w',
+			'e',
+			'r',
+			't',
+			'y',
+			'u',
+			'i',
+			'o',
+			'p',
+			'a',
+			's',
+			'd',
+			'f',
+			'g',
+			'h',
+			'j',
+			'k',
+			'l',
+			'z',
+			'x',
+			'c',
+			'v',
+			'b',
+			'n',
+			'm'
+		];
+		return [...norwegian, ...english];
+	}
+
+	private isAllowedKey(key: string): boolean {
+		const actions = ['enter', 'backspace'];
+		const norwegian = ['æ', 'ø', 'å'];
+		const english = [
+			'q',
+			'w',
+			'e',
+			'r',
+			't',
+			'y',
+			'u',
+			'i',
+			'o',
+			'p',
+			'a',
+			's',
+			'd',
+			'f',
+			'g',
+			'h',
+			'j',
+			'k',
+			'l',
+			'z',
+			'x',
+			'c',
+			'v',
+			'b',
+			'n',
+			'm'
+		];
+		return [...norwegian, ...actions, ...english].includes(key.toLowerCase());
 	}
 
 	private addInputToTile(letter: string): void {
@@ -167,7 +212,7 @@ export class WordBoard {
 	}
 
 	private isRowCompleted(): boolean {
-		return this.currentTileIdx == this.numberOfTiles - 1;
+		return this.currentTileIdx == this.numberOfTiles;
 	}
 
 	private isGameCompleted(): boolean {
@@ -177,7 +222,6 @@ export class WordBoard {
 	}
 
 	private startNewRow(): void {
-		this.rowCompleted = false;
 		this.currentRowIdx++;
 		this.currentTileIdx = 0;
 	}
@@ -187,16 +231,12 @@ export class WordBoard {
 	}
 
 	private updateGame(): void {
-		if (this.isGameCompleted()) {
-			this.gameCompleted = true;
-		} else if (this.isRowCompleted()) {
-			this.rowCompleted = true;
-		} else {
+		if (!this.isRowCompleted()) {
 			this.nextTile();
 		}
 	}
 
-	private static checkValidWord(word: string) {
+	private checkValidWord(word: string) {
 		return true;
 	}
 
@@ -208,9 +248,9 @@ export class WordBoard {
 		for (let i = 0; i < letterArr.length; i++) {
 			const char = letterArr[i];
 
-			if (char === this.solution[i]) {
+			if (char === this.solutionWord[i]) {
 				result.push('correct');
-			} else if (this.solution.includes(char)) {
+			} else if (this.solutionWord.includes(char)) {
 				result.push('present');
 			} else {
 				result.push('notPresent');

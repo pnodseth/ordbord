@@ -1,4 +1,4 @@
-import { WordBoard } from '../components/WordBoard';
+import { WordBoard } from '../WordBoard';
 
 test('Initial boardstate to be empty strings', () => {
 	const wordLength = 5;
@@ -45,7 +45,9 @@ test('Enter should be disabled until end of row', () => {
 	const board = new WordBoard({ rows, solution: 'jiras', tiles: wordLength });
 
 	board.addLetter('q');
-	const { boardState } = board.addLetter('Enter');
+	board.addLetter('Enter');
+
+	const { boardState } = board.getBoardState();
 
 	const expected = [
 		['q', '', '', '', ''],
@@ -65,10 +67,36 @@ test('Back should remove previously added letter', () => {
 	const board = new WordBoard({ rows, solution: 'jiras', tiles: wordLength });
 
 	board.addLetter('q');
-	const { boardState } = board.addLetter('Back');
+	board.addLetter('Backspace');
+	const { boardState } = board.getBoardState();
 
 	const expected = [
 		['', '', '', '', ''],
+		['', '', '', '', ''],
+		['', '', '', '', ''],
+		['', '', '', '', ''],
+		['', '', '', '', ''],
+		['', '', '', '', '']
+	];
+
+	expect(boardState).toEqual(expected);
+});
+
+test('Back should remove previously added letter when entered full row', () => {
+	const wordLength = 5;
+	const rows = 6;
+	const board = new WordBoard({ rows, solution: 'jiras', tiles: wordLength });
+
+	board.addLetter('p');
+	board.addLetter('h');
+	board.addLetter('a');
+	board.addLetter('r');
+	board.addLetter('s');
+	board.addLetter('Backspace');
+	const { boardState } = board.getBoardState();
+
+	const expected = [
+		['p', 'h', 'a', 'r', ''],
 		['', '', '', '', ''],
 		['', '', '', '', ''],
 		['', '', '', '', ''],
@@ -89,7 +117,9 @@ test('Expect first row to have submitted state after row complete', () => {
 	board.addLetter('q');
 	board.addLetter('q');
 	board.addLetter('q');
-	const { submitted } = board.addLetter('Enter');
+	board.addLetter('Enter');
+
+	const { submitted } = board.getBoardState();
 
 	const expected = [true, false, false, false, false];
 	expect(submitted).toEqual(expected);
@@ -185,4 +215,28 @@ test('Expect valid row submission to produce array of correct letter indicators'
 	board.addLetter('Enter');
 
 	expect(result).toEqual(expected);
+});
+
+test('Expect Enter and Backspace to not be allowed as input letters', () => {
+	const wordLength = 5;
+	const rows = 6;
+	const solution = 'prism';
+	const expected = [
+		['', '', '', '', ''],
+		['', '', '', '', ''],
+		['', '', '', '', ''],
+		['', '', '', '', ''],
+		['', '', '', '', ''],
+		['', '', '', '', '']
+	];
+	const board = new WordBoard({ rows, solution, tiles: wordLength });
+
+	board.addLetter('i');
+	board.addLetter('Enter');
+	board.addLetter('Enter');
+	board.addLetter('Backspace');
+	board.addLetter('Backspace');
+	const { boardState } = board.getBoardState();
+
+	expect(boardState).toEqual(expected);
 });

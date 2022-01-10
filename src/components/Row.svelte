@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Tile from './Tile.svelte';
-	import type { LetterIndicator } from './WordBoard';
+	import type { LetterIndicator } from '../WordBoard/interface';
 
 	export let tiles: number[] = [];
 	export let row: number;

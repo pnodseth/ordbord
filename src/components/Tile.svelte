@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { LetterIndicator } from './WordBoard';
+	import type { LetterIndicator } from '../WordBoard/interface';
 
 	export let tile: number;
 	export let row: number;

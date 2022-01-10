@@ -1,7 +1,8 @@
 <script lang="ts">
 	import Row from '../components/Row.svelte';
 	import Keyboard from '../components/Keyboard.svelte';
-	import { LetterIndicator, WordBoard } from '../components/WordBoard';
+	import { WordBoard } from '../WordBoard/WordBoard';
+	import type { LetterIndicator } from '../WordBoard/interface';
 
 	let tilesArr;
 	let rowsArr;
@@ -34,6 +35,13 @@
 	tilesArr = Array.from({ length: solution.length }, (x, i) => i);
 	rowsArr = Array.from({ length: rowsCount }, (x, i) => i);
 
+	function handleInput(key) {
+		console.log({ key }, key);
+		let result = game.addLetter(key);
+		if (result) {
+			boardState = result;
+		}
+	}
 	function handleTap(e) {
 		if (inputsDisabled) {
 			return;
@@ -43,8 +51,13 @@
 			boardState = result;
 		}
 	}
+
+	function handleKeyboardInput(e) {
+		handleInput(e.key);
+	}
 </script>
 
+<svelte:body on:keyup={handleKeyboardInput} />
 <h1>Ordbord</h1>
 <main>
 	<div id="board" class="font-bold h-96 m-auto w-80 grid grid-rows-6 gap-0.5">
