@@ -4,9 +4,6 @@ interface Config {
 	submitKey?: string;
 	backKey?: string;
 	solution: string;
-	events?: {
-		onInvalidWord: () => void;
-	};
 }
 
 interface BoardState {
@@ -18,7 +15,12 @@ interface ReturnData {
 	updatedBoardState: BoardState;
 	gameCompleted: boolean;
 	rowCompleted: boolean;
-	rowSubmitted: boolean;
+}
+
+interface RegisterEventsProps {
+	onValidWord?: () => void;
+	onInvalidWord?: () => void;
+	onGameCompleted?: () => void;
 }
 
 export class WordBoard {
@@ -32,7 +34,14 @@ export class WordBoard {
 	SUBMIT_KEY = 'Enter';
 	BACKSPACE_KEY = 'Back';
 	solution = '';
-	onInvalidWord: () => void;
+	private onInvalidWord: () => void = () =>
+		console.log('Not implemented. Register onInvalidWord handler with add registerEvents method');
+	private onValidWord: () => void = () =>
+		console.log('not implemented.Register onInvalidWord handler with add registerEvents method');
+	private onGameCompleted: () => void = () =>
+		console.log(
+			'not implemented.Register onGameCompleted event handler with add registerEvents method'
+		);
 
 	constructor(config: Config) {
 		this.numberOfTiles = config.tiles;
@@ -44,19 +53,24 @@ export class WordBoard {
 		if (config.solution.length !== config.tiles) {
 			throw Error('Solution word must have same amount of characters as config.');
 		}
-		if (typeof config.events?.onInvalidWord === 'function') {
-			this.onInvalidWord = config.events.onInvalidWord;
-		}
 
 		this.setupBoard();
+	}
+
+	registerEvents(obj: RegisterEventsProps) {
+		if (typeof obj.onValidWord === 'function') {
+			this.onValidWord = obj.onValidWord;
+		}
+		if (typeof obj.onInvalidWord === 'function') {
+			this.onInvalidWord = obj.onInvalidWord;
+		}
 	}
 
 	addLetter(key: string): ReturnData {
 		const returnData = {
 			updatedBoardState: null,
 			gameCompleted: false,
-			rowCompleted: false,
-			rowSubmitted: false
+			rowCompleted: false
 		};
 
 		if (this.gameCompleted) {
@@ -73,7 +87,9 @@ export class WordBoard {
 					this.submitWord();
 					this.startNewRow();
 
-					returnData.rowSubmitted = true;
+					if (typeof this.onValidWord === 'function') {
+						this.onValidWord();
+					}
 				} else {
 					//todo: Add event onInvalidWord
 					if (this.onInvalidWord) {
@@ -175,7 +191,6 @@ export class WordBoard {
 			console.log('Row is completed');
 			this.rowCompleted = true;
 		} else {
-			console.log('next tile');
 			this.nextTile();
 		}
 	}

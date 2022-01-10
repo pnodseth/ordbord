@@ -10,14 +10,17 @@
 	let game = new WordBoard({
 		tiles: 5,
 		rows: 6,
-		solution,
-		events: {
-			onInvalidWord: () => {
-				console.log('triggered invalid word');
-			}
-		}
+		solution
 	});
 	let boardState = game.boardState;
+	game.registerEvents({
+		onInvalidWord: () => {
+			console.log('triggered invalid word');
+		},
+		onValidWord: () => {
+			console.log('WORD WAS VALID! Submitted now');
+		}
+	});
 
 	tiles = Array.from({ length: game.numberOfTiles }, (x, i) => i);
 	rows = Array.from({ length: game.numberOfRows }, (x, i) => i);
@@ -26,13 +29,10 @@
 		if (inputsDisabled) {
 			return;
 		}
-		const { updatedBoardState, rowSubmitted, gameCompleted } = game.addLetter(e.detail);
+		const { updatedBoardState, gameCompleted } = game.addLetter(e.detail);
 		console.log('updated: ', updatedBoardState);
 		boardState = updatedBoardState;
 
-		if (rowSubmitted) {
-			console.log('ROOOW WAS SUBMITTED');
-		}
 		if (gameCompleted) {
 			console.log('game completed!!!');
 		}

@@ -95,3 +95,28 @@ test('Expect first row to have submitted state after row complete', () => {
 	const expected = [true, false, false, false, false];
 	expect(updatedBoardState.submitted).toEqual(expected);
 });
+
+test('Expect onValidWord event to be triggered after row complete', () => {
+	const wordLength = 5;
+	const rows = 6;
+	const expected = 'it works!';
+	let eventString = '';
+
+	const board = new WordBoard({ rows, solution: 'jiras', tiles: wordLength });
+
+	board.registerEvents({
+		onValidWord: () => (eventString = expected)
+	});
+
+	board.addLetter('q');
+	board.addLetter('q');
+	board.addLetter('q');
+	board.addLetter('q');
+	board.addLetter('q');
+	board.addLetter('Enter');
+	expect(eventString).toBe(expected);
+});
+
+/*test("Expect onInvalid event to be triggerd after submitting invalid word", () => {
+
+})*/
