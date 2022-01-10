@@ -3,7 +3,7 @@ export interface Config {
 	rows: number;
 	submitKey?: string;
 	backKey?: string;
-	solution: string;
+	solution?: string;
 }
 
 export interface BoardState {

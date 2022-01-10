@@ -1,4 +1,5 @@
 import type { BoardState, Config, LetterIndicator, RegisterEventsProps } from './interface';
+import dictionary from './filtered.json';
 
 export class WordBoard {
 	private numberOfTiles = 5;
@@ -10,6 +11,7 @@ export class WordBoard {
 	private gameEnded = false;
 	SUBMIT_KEY = 'enter';
 	BACKSPACE_KEY = 'backspace';
+	dict = dictionary['5'];
 
 	private onInvalidWord: () => void = () =>
 		console.log('Not implemented. Register onInvalidWord handler with add registerEvents method');
@@ -21,15 +23,21 @@ export class WordBoard {
 		);
 
 	constructor(config: Config) {
+		this.dict = dictionary[config.tiles.toString()];
+
+		if (!config.solution || config.solution === '') {
+			this.setRandomWord();
+		} else {
+			this.solutionWord = config.solution;
+		}
 		this.numberOfTiles = config.tiles;
 		this.numberOfRows = config.rows;
 		if (config.submitKey) this.SUBMIT_KEY = config.submitKey;
 		if (config.backKey) this.BACKSPACE_KEY = config.backKey;
-		this.solutionWord = config.solution;
 
-		if (config.solution.length !== config.tiles) {
+		/*if (this.solutionWord.length !== config.tiles) {
 			throw Error('Solution word must have same amount of characters as config.');
-		}
+		}*/
 
 		this.setupBoard();
 	}
@@ -79,10 +87,10 @@ export class WordBoard {
 						this.onGameCompleted(WordBoard.isCorrectAnswer(indicators));
 						this.gameEnded = true;
 					}
+					this.startNewRow();
 				} else {
 					this.onInvalidWord();
 				}
-				this.startNewRow();
 			} else if (key == this.BACKSPACE_KEY) {
 				this.deleteLastLetter();
 			}
@@ -202,7 +210,7 @@ export class WordBoard {
 	}
 
 	private checkValidWord(word: string) {
-		return true;
+		return this.dict.includes(word);
 	}
 
 	private getIndicatorsForCurrentRow(): LetterIndicator[] {
@@ -226,5 +234,19 @@ export class WordBoard {
 
 	getBoardState(): BoardState {
 		return this.boardState;
+	}
+
+	setRandomWord() {
+		const rnd = Math.floor(Math.random() * (this.dict.length - 1) + 1);
+		this.solutionWord = this.dict[rnd];
+	}
+
+	static getRandomWord(length: number) {
+		if (length < 3 || length > 8) {
+			throw new Error('Word must be between 3 and 8 letters');
+		} else {
+			const rnd = Math.floor(Math.random() * (dictionary[length.toString()].length - 1));
+			return dictionary[length.toString()][rnd];
+		}
 	}
 }

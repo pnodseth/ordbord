@@ -9,12 +9,11 @@
 	let rowsCount = 6;
 	let inputsDisabled = false;
 	let indicators: LetterIndicator[][] = [];
+	const numberOfLetters = 5;
 
-	const solution = 'pharm';
 	let game = new WordBoard({
-		tiles: solution.length,
-		rows: rowsCount,
-		solution
+		tiles: numberOfLetters,
+		rows: rowsCount
 	});
 	let boardState = game.getBoardState();
 
@@ -32,7 +31,7 @@
 		}
 	});
 
-	tilesArr = Array.from({ length: solution.length }, (x, i) => i);
+	tilesArr = Array.from({ length: numberOfLetters }, (x, i) => i);
 	rowsArr = Array.from({ length: rowsCount }, (x, i) => i);
 
 	function handleInput(key) {
