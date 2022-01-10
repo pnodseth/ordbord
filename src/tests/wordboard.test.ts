@@ -140,6 +140,31 @@ test('Expect onGameCompleted event to be triggered after row complete', () => {
 	expect(eventString).toBe(expected);
 });
 
+test('Expect onGameCompleted event to NOT be triggered after row complete with wrong word', () => {
+	const wordLength = 5;
+	const rows = 6;
+	const solution = 'jiras';
+	const expected = 'game is now completed!';
+	let eventString = '';
+
+	const board = new WordBoard({ rows, solution, tiles: wordLength });
+
+	board.registerEvents({
+		onGameCompleted: () => {
+			eventString = expected;
+		}
+	});
+
+	board.addLetter('j');
+	board.addLetter('j');
+	board.addLetter('j');
+	board.addLetter('j');
+	board.addLetter('j');
+	board.addLetter('Enter');
+
+	expect(eventString).toEqual('');
+});
+
 test('Expect valid row submission to produce array of correct letter indicators', () => {
 	const wordLength = 5;
 	const rows = 6;

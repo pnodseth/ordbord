@@ -26,8 +26,8 @@
 			console.log('indicators: ', result);
 			console.log('WORD WAS VALID! Submitted now');
 		},
-		onGameCompleted: () => {
-			console.log('GAME IS COMPLETE.. MUAAH');
+		onGameCompleted: (result) => {
+			console.log('GAME IS COMPLETE.. with result: ', result);
 		}
 	});
 
@@ -38,7 +38,10 @@
 		if (inputsDisabled) {
 			return;
 		}
-		boardState = game.addLetter(e.detail);
+		let result = game.addLetter(e.detail);
+		if (result) {
+			boardState = result;
+		}
 	}
 </script>
 

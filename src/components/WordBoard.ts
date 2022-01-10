@@ -14,7 +14,7 @@ interface BoardState {
 interface RegisterEventsProps {
 	onValidWord?: (result: LetterIndicator[]) => void;
 	onInvalidWord?: () => void;
-	onGameCompleted?: () => void;
+	onGameCompleted?: (correct: boolean) => void;
 }
 
 export type LetterIndicator = 'notPresent' | 'present' | 'correct';
@@ -27,14 +27,16 @@ export class WordBoard {
 	private boardState: BoardState = { boardState: [], submitted: [] };
 	private gameCompleted = false;
 	private rowCompleted = false;
+	private solution = '';
+	private gameEnded = false;
 	SUBMIT_KEY = 'Enter';
 	BACKSPACE_KEY = 'Back';
-	private solution = '';
+
 	private onInvalidWord: () => void = () =>
 		console.log('Not implemented. Register onInvalidWord handler with add registerEvents method');
 	private onValidWord: (result: LetterIndicator[]) => void = () =>
 		console.log('not implemented.Register onValidWord handler with add registerEvents method');
-	private onGameCompleted: () => void = () =>
+	private onGameCompleted: (correct: boolean) => void = () =>
 		console.log(
 			'not implemented.Register onGameCompleted event handler with add registerEvents method'
 		);
@@ -65,13 +67,16 @@ export class WordBoard {
 		}
 	}
 
-	addLetter(key: string): BoardState {
-		if (this.gameCompleted) {
+	addLetter(key: string): BoardState | undefined {
+		if (this.gameEnded) {
+			return;
+		} else if (this.gameCompleted) {
 			if (key === 'Enter') {
 				this.submitWord();
 				const indicators = this.getIndicatorsForCurrentRow();
 				this.onValidWord(indicators);
-				this.onGameCompleted();
+				this.onGameCompleted(WordBoard.isCorrectAnswer(indicators));
+				this.gameEnded = true;
 			}
 		} else if (this.rowCompleted) {
 			if (key === 'Enter') {
@@ -81,7 +86,13 @@ export class WordBoard {
 				if (isValid) {
 					this.submitWord();
 					const indicators = this.getIndicatorsForCurrentRow();
+
 					this.onValidWord(indicators);
+
+					if (WordBoard.isCorrectAnswer(indicators)) {
+						this.onGameCompleted(WordBoard.isCorrectAnswer(indicators));
+						this.gameEnded = true;
+					}
 				} else {
 					this.onInvalidWord();
 				}
@@ -102,6 +113,10 @@ export class WordBoard {
 		}
 
 		return this.boardState;
+	}
+
+	private static isCorrectAnswer(indicators: LetterIndicator[]) {
+		return !indicators.includes('present') && !indicators.includes('notPresent');
 	}
 
 	private setupBoard(): void {
