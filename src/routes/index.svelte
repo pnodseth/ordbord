@@ -36,7 +36,6 @@
 	rowsArr = Array.from({ length: rowsCount }, (x, i) => i);
 
 	function handleInput(key) {
-		console.log({ key }, key);
 		let result = game.addLetter(key);
 		if (result) {
 			boardState = result;

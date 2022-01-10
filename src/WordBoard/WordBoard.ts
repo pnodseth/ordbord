@@ -82,7 +82,6 @@ export class WordBoard {
 				}
 				this.startNewRow();
 			} else if (key == this.BACKSPACE_KEY) {
-				console.log('hi');
 				this.deleteLastLetter();
 			}
 		} else {
@@ -92,7 +91,7 @@ export class WordBoard {
 			} else if (this.isInputKey(key)) {
 				this.addInputToTile(key);
 
-				this.updateGame();
+				this.nextTile();
 			}
 		}
 
@@ -228,12 +227,6 @@ export class WordBoard {
 
 	private nextTile(): void {
 		this.currentTileIdx++;
-	}
-
-	private updateGame(): void {
-		if (!this.isRowCompleted()) {
-			this.nextTile();
-		}
 	}
 
 	private checkValidWord(word: string) {
