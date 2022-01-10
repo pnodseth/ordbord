@@ -8,8 +8,8 @@ export class WordBoard {
 	private boardState: BoardState = { boardState: [], submitted: [] };
 	private solutionWord = '';
 	private gameEnded = false;
-	SUBMIT_KEY = 'Enter';
-	BACKSPACE_KEY = 'Backspace';
+	SUBMIT_KEY = 'enter';
+	BACKSPACE_KEY = 'backspace';
 
 	private onInvalidWord: () => void = () =>
 		console.log('Not implemented. Register onInvalidWord handler with add registerEvents method');
@@ -46,7 +46,9 @@ export class WordBoard {
 		}
 	}
 
-	addLetter(key: string): BoardState | undefined {
+	addLetter(k: string): BoardState | undefined {
+		const key = k.toLowerCase();
+
 		if (!this.isAllowedKey(key)) {
 			return;
 		}
@@ -55,7 +57,7 @@ export class WordBoard {
 
 			// Game Completed
 		} else if (this.isGameCompleted()) {
-			if (key === 'Enter') {
+			if (key === this.SUBMIT_KEY) {
 				this.submitWord();
 				const indicators = this.getIndicatorsForCurrentRow();
 				this.onValidWord(indicators);
@@ -63,7 +65,7 @@ export class WordBoard {
 				this.gameEnded = true;
 			}
 		} else if (this.isRowCompleted()) {
-			if (key === 'Enter') {
+			if (key === this.SUBMIT_KEY) {
 				const word = this.boardState.boardState[this.currentRowIdx].join('');
 				const isValid = this.checkValidWord(word);
 
@@ -169,37 +171,9 @@ export class WordBoard {
 	}
 
 	private isAllowedKey(key: string): boolean {
-		const actions = ['enter', 'backspace'];
-		const norwegian = ['æ', 'ø', 'å'];
-		const english = [
-			'q',
-			'w',
-			'e',
-			'r',
-			't',
-			'y',
-			'u',
-			'i',
-			'o',
-			'p',
-			'a',
-			's',
-			'd',
-			'f',
-			'g',
-			'h',
-			'j',
-			'k',
-			'l',
-			'z',
-			'x',
-			'c',
-			'v',
-			'b',
-			'n',
-			'm'
-		];
-		return [...norwegian, ...actions, ...english].includes(key.toLowerCase());
+		const actions = [this.SUBMIT_KEY, this.BACKSPACE_KEY];
+		const inputKeys = this.getInputKeys();
+		return [...inputKeys, ...actions].includes(key.toLowerCase());
 	}
 
 	private addInputToTile(letter: string): void {
