@@ -17,24 +17,27 @@
 </script>
 
 <p
-	class="border-gray-200 border-2 flex justify-center items-center"
+	class="border-gray-200 border-2 flex justify-center items-center rounded-sm bg-"
 	class:correct={indicator === 'correct'}
 	class:present={indicator === 'present'}
 	class:not-present={indicator === 'notPresent'}
 >
-	{tileText}
+	{tileText.toUpperCase()}
 </p>
 
 <style>
 	.correct {
 		background: green;
+		color: #fff;
+		border: none;
 	}
 
 	.present {
-		background-color: yellow;
+		background-color: rgb(252, 211, 77);
+		border: none;
 	}
 
 	.not-present {
-		background-color: #9ca3af;
+		background-color: #bdc6d5;
 	}
 </style>

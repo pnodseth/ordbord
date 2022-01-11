@@ -63,7 +63,7 @@ export class WordBoard {
 
 	addLetter(k: string): BoardState | undefined {
 		const key = k.toLowerCase();
-
+		console.log(key);
 		if (!this.isAllowedKey(key)) {
 			return;
 		}
@@ -248,6 +248,10 @@ export class WordBoard {
 	setRandomWord(): void {
 		const rnd = Math.floor(Math.random() * (this.dict.length - 1) + 1);
 		this.solutionWord = this.dict[rnd];
+	}
+
+	getHint(): string {
+		return this.solutionWord[this.currentTileIdx];
 	}
 
 	static getRandomWord(length: number): string {
