@@ -239,6 +239,28 @@ test('Expect valid row submission to produce array of correct letter indicators'
 	expect(result).toEqual(expected);
 });
 
+test('Expect onGameCompleted event to have solution word argument', () => {
+	const wordLength = 5;
+	const rows = 6;
+	const solution = 'riske';
+	let expected = '';
+	let result;
+	const board = new WordBoard({ rows, solution, tiles: wordLength });
+	board.registerEvents({
+		onGameCompleted: (result, word) => {
+			expected = word;
+		}
+	});
+	board.addLetter('r');
+	board.addLetter('i');
+	board.addLetter('s');
+	board.addLetter('k');
+	board.addLetter('e');
+	board.addLetter('Enter');
+
+	expect(solution).toBe(expected);
+});
+
 test('Expect Enter and Backspace to not be allowed as input letters', () => {
 	const wordLength = 5;
 	const rows = 6;

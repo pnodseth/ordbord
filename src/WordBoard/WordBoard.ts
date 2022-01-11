@@ -1,4 +1,10 @@
-import type { BoardState, Config, LetterIndicator, RegisterEventsProps } from './interface';
+import type {
+	BoardState,
+	Config,
+	KeyIndicator,
+	LetterIndicator,
+	RegisterEventsProps
+} from './interface';
 import dictionary from './filtered.json';
 
 export class WordBoard {
@@ -15,12 +21,13 @@ export class WordBoard {
 
 	private onInvalidWord: () => void = () =>
 		console.log('Not implemented. Register onInvalidWord handler with add registerEvents method');
-	private onValidWord: (result: LetterIndicator[]) => void = () =>
+	private onValidWord: (result: LetterIndicator[], keyIndicators: KeyIndicator) => void = () =>
 		console.log('not implemented.Register onValidWord handler with add registerEvents method');
 	private onGameCompleted: (correct: boolean, word: string) => void = () =>
 		console.log(
 			'not implemented.Register onGameCompleted event handler with add registerEvents method'
 		);
+	private keyIndicators: KeyIndicator = {};
 
 	constructor(config: Config) {
 		this.dict = dictionary[config.tiles.toString()];
@@ -68,7 +75,7 @@ export class WordBoard {
 			if (key === this.SUBMIT_KEY) {
 				this.submitWord();
 				const indicators = this.getIndicatorsForCurrentRow();
-				this.onValidWord(indicators);
+				this.onValidWord(indicators, this.keyIndicators);
 				this.onGameCompleted(WordBoard.isCorrectAnswer(indicators), this.solutionWord);
 				this.gameEnded = true;
 			}
@@ -79,12 +86,11 @@ export class WordBoard {
 
 				if (isValid) {
 					this.submitWord();
-					const indicators = this.getIndicatorsForCurrentRow();
+					const rowIndicators = this.getIndicatorsForCurrentRow();
+					this.onValidWord(rowIndicators, this.keyIndicators);
 
-					this.onValidWord(indicators);
-
-					if (WordBoard.isCorrectAnswer(indicators)) {
-						this.onGameCompleted(WordBoard.isCorrectAnswer(indicators), this.solutionWord);
+					if (WordBoard.isCorrectAnswer(rowIndicators)) {
+						this.onGameCompleted(WordBoard.isCorrectAnswer(rowIndicators), this.solutionWord);
 						this.gameEnded = true;
 					}
 					this.startNewRow();
@@ -223,10 +229,13 @@ export class WordBoard {
 
 			if (char === this.solutionWord[i]) {
 				result.push('correct');
+				this.keyIndicators[char] = 'correct';
 			} else if (this.solutionWord.includes(char)) {
 				result.push('present');
+				this.keyIndicators[char] = 'present';
 			} else {
 				result.push('notPresent');
+				this.keyIndicators[char] = 'notPresent';
 			}
 		}
 		return result;
@@ -236,12 +245,12 @@ export class WordBoard {
 		return this.boardState;
 	}
 
-	setRandomWord() {
+	setRandomWord(): void {
 		const rnd = Math.floor(Math.random() * (this.dict.length - 1) + 1);
 		this.solutionWord = this.dict[rnd];
 	}
 
-	static getRandomWord(length: number) {
+	static getRandomWord(length: number): string {
 		if (length < 3 || length > 8) {
 			throw new Error('Word must be between 3 and 8 letters');
 		} else {

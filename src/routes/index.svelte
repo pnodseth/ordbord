@@ -2,13 +2,14 @@
 	import Row from '../components/Row.svelte';
 	import Keyboard from '../components/Keyboard.svelte';
 	import { WordBoard } from '../WordBoard/WordBoard';
-	import type { LetterIndicator } from '../WordBoard/interface';
+	import type { KeyIndicator, LetterIndicator } from '../WordBoard/interface';
 
 	let tilesArr;
 	let rowsArr;
 	let rowsCount = 6;
 	let inputsDisabled = false;
-	let indicators: LetterIndicator[][] = [];
+	let rowIndicators: LetterIndicator[][] = [];
+	let keyIndicators: KeyIndicator = {};
 	const numberOfLetters = 5;
 
 	let game = new WordBoard({
@@ -21,10 +22,9 @@
 		onInvalidWord: () => {
 			console.log('triggered invalid word');
 		},
-		onValidWord: (result) => {
-			indicators.push(result);
-			console.log('indicators: ', result);
-			console.log('WORD WAS VALID! Submitted now');
+		onValidWord: (result, keyInd) => {
+			rowIndicators.push(result);
+			keyIndicators = keyInd;
 		},
 		onGameCompleted: (result: boolean, word: string) => {
 			console.log('GAME IS COMPLETE.. with result: ', result);
@@ -68,11 +68,11 @@
 				{row}
 				entered={boardState.boardState}
 				submissions={boardState.submitted}
-				{indicators}
+				indicators={rowIndicators}
 			/>
 		{/each}
 	</div>
-	<Keyboard on:tap={handleTap} />
+	<Keyboard on:tap={handleTap} {keyIndicators} />
 </main>
 
 <style>

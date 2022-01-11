@@ -12,9 +12,13 @@ export interface BoardState {
 }
 
 export interface RegisterEventsProps {
-	onValidWord?: (result: LetterIndicator[]) => void;
+	onValidWord?: (result: LetterIndicator[], keyIndicators: KeyIndicator) => void;
 	onInvalidWord?: () => void;
 	onGameCompleted?: (correct: boolean, word: string) => void;
+}
+
+export interface KeyIndicator {
+	[key: string]: LetterIndicator;
 }
 
 export type LetterIndicator = 'notPresent' | 'present' | 'correct';
