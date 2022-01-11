@@ -26,8 +26,11 @@
 			console.log('indicators: ', result);
 			console.log('WORD WAS VALID! Submitted now');
 		},
-		onGameCompleted: (result) => {
+		onGameCompleted: (result: boolean, word: string) => {
 			console.log('GAME IS COMPLETE.. with result: ', result);
+			if (!result) {
+				console.log(`Sorry... Correct word was ${word}`);
+			}
 		}
 	});
 

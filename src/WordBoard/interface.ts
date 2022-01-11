@@ -14,7 +14,7 @@ export interface BoardState {
 export interface RegisterEventsProps {
 	onValidWord?: (result: LetterIndicator[]) => void;
 	onInvalidWord?: () => void;
-	onGameCompleted?: (correct: boolean) => void;
+	onGameCompleted?: (correct: boolean, word: string) => void;
 }
 
 export type LetterIndicator = 'notPresent' | 'present' | 'correct';

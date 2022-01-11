@@ -17,7 +17,7 @@ export class WordBoard {
 		console.log('Not implemented. Register onInvalidWord handler with add registerEvents method');
 	private onValidWord: (result: LetterIndicator[]) => void = () =>
 		console.log('not implemented.Register onValidWord handler with add registerEvents method');
-	private onGameCompleted: (correct: boolean) => void = () =>
+	private onGameCompleted: (correct: boolean, word: string) => void = () =>
 		console.log(
 			'not implemented.Register onGameCompleted event handler with add registerEvents method'
 		);
@@ -69,7 +69,7 @@ export class WordBoard {
 				this.submitWord();
 				const indicators = this.getIndicatorsForCurrentRow();
 				this.onValidWord(indicators);
-				this.onGameCompleted(WordBoard.isCorrectAnswer(indicators));
+				this.onGameCompleted(WordBoard.isCorrectAnswer(indicators), this.solutionWord);
 				this.gameEnded = true;
 			}
 		} else if (this.isRowCompleted()) {
@@ -84,7 +84,7 @@ export class WordBoard {
 					this.onValidWord(indicators);
 
 					if (WordBoard.isCorrectAnswer(indicators)) {
-						this.onGameCompleted(WordBoard.isCorrectAnswer(indicators));
+						this.onGameCompleted(WordBoard.isCorrectAnswer(indicators), this.solutionWord);
 						this.gameEnded = true;
 					}
 					this.startNewRow();
