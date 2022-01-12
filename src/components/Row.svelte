@@ -9,7 +9,7 @@
 	export let indicators: LetterIndicator[];
 
 	let submitted: boolean;
-	let colsclass = '';
+	let colsclass = 'grid-cols-5';
 	$: {
 		if (row) {
 			submitted = submissions[row];
@@ -23,7 +23,7 @@
 	}
 </script>
 
-<div id="row" class="grid {colsclass} gap-1">
+<div class="row grid {colsclass} gap-1">
 	{#each tiles as tile}
 		<Tile {tile} {row} {entered} {indicators} />
 	{/each}
