@@ -17,7 +17,7 @@
 </script>
 
 <p
-	class="border-gray-200 border-2 flex justify-center items-center rounded-sm bg-"
+	class="border-2 flex justify-center items-center rounded-sm text-2xl"
 	class:correct={indicator === 'correct'}
 	class:present={indicator === 'present'}
 	class:not-present={indicator === 'notPresent'}
@@ -26,6 +26,10 @@
 </p>
 
 <style>
+	p {
+		border-color: #bfbfbfad;
+		background: #f0f8ff36;
+	}
 	.correct {
 		background: green;
 		color: #fff;
