@@ -22,6 +22,7 @@
 		height: 58px;
 		border-radius: 4px;
 		-webkit-tap-highlight-color: rgba(0, 0, 0, 0.3);
+		color: #343434;
 	}
 
 	.correct {
