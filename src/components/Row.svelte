@@ -17,7 +17,9 @@
 	}
 
 	$: {
-		colsclass = `grid-cols-${tiles.length}`;
+		if (tiles.length > 0) {
+			colsclass = `grid-cols-${tiles.length}`;
+		}
 	}
 </script>
 

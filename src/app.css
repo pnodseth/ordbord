@@ -7,3 +7,7 @@
     --color-pink: #edc1c1;
     --color-green: #c1dced;
 }
+
+#svelte {
+    background: #f1efef;
+}

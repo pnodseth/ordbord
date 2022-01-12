@@ -13,6 +13,7 @@
 <button
 	on:click
 	class="font-bold border-0 p-0 mt-0 mr-1 mb-0 ml-0 flex-1 flex justify-center items-center cursor-pointer uppercase"
+	class:text-xs={key === 'Enter'}
 	class:correct={indicator === 'correct'}
 	class:not-present={indicator === 'notPresent'}><slot /></button
 >
@@ -32,7 +33,7 @@
 	}
 
 	.not-present {
-		background-color: #71757c;
+		background-color: #bdc6d5;
 		color: #e5e7eb;
 	}
 </style>
