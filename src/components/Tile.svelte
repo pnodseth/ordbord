@@ -12,7 +12,11 @@
 	$: {
 		tileText = entered[row][tile];
 
-		if (indicators[row]) indicator = indicators[row][tile];
+		if (indicators[row]) {
+			indicator = indicators[row][tile];
+		} else {
+			indicator = null;
+		}
 	}
 </script>
 

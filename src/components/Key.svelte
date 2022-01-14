@@ -3,10 +3,14 @@
 
 	export let key: string;
 	export let keyIndicators: KeyIndicator = {};
-	let indicator: LetterIndicator = null;
+	let indicator: LetterIndicator;
 
 	$: {
-		if (key && keyIndicators[key]) indicator = keyIndicators[key];
+		if (key && keyIndicators[key]) {
+			indicator = keyIndicators[key];
+		} else {
+			indicator = null;
+		}
 	}
 </script>
 

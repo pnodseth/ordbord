@@ -63,7 +63,7 @@ export class WordBoard {
 
 	addLetter(k: string): BoardState | undefined {
 		const key = k.toLowerCase();
-		console.log(key);
+
 		if (!this.isAllowedKey(key)) {
 			return;
 		}
