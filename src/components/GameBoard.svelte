@@ -24,17 +24,17 @@
 		boardState = undefined;
 	}
 
-	export function startNewGame(wordLength: number, rows: number): void {
+	export function startNewGame(wordLength: number, rows: number, solution?: string): void {
 		resetState();
 		game = new WordBoard({
 			tiles: wordLength,
-			rows: rows
+			rows: rows,
+			solution: solution || null
 		});
 		boardState = game.getBoardState();
 
 		game.registerEvents({
 			onInvalidWord: (word, rowIdx) => {
-				console.log('triggered invalid word', rowIdx);
 				displayInvalidRow = rowIdx;
 				setTimeout(() => {
 					displayInvalidRow = null;
