@@ -18,7 +18,7 @@
 	}
 
 	onMount(() => {
-		startNewGame(5, 6, 'treff');
+		startNewGame(5, 6);
 	});
 
 	function handleResult(e) {
