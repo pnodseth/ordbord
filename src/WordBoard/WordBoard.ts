@@ -77,12 +77,12 @@ export class WordBoard {
 				if (isValid) {
 					this.submitWord();
 					const rowIndicators = this.getIndicatorsForCurrentRow();
+
 					this.onValidWord(rowIndicators, this.keyIndicators);
 
 					if (WordBoard.isCorrectAnswer(rowIndicators) || this.isGameCompleted()) {
 						this.onGameCompleted(WordBoard.isCorrectAnswer(rowIndicators), this.solutionWord);
 						this.gameEnded = true;
-						return;
 					}
 
 					this.startNewRow();
