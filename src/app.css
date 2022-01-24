@@ -8,6 +8,12 @@
     --color-green: #c1dced;
 }
 
+body {
+    touch-action: manipulation;
+}
+
 #svelte {
     background: #f1efef;
 }
+
+
