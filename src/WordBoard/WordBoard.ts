@@ -1,10 +1,4 @@
-import type {
-	BoardState,
-	Config,
-	KeyIndicator,
-	LetterIndicator,
-	RegisterEventsProps
-} from './interface';
+import type { BoardState, Config, KeyIndicator, LetterIndicator } from './interface';
 import dictionary from './filtered.json';
 
 export class WordBoard {
@@ -19,7 +13,7 @@ export class WordBoard {
 	BACKSPACE_KEY = 'backspace';
 	dict = dictionary['5'];
 
-	private onInvalidWord: () => void = () =>
+	private onInvalidWord: (word: string, rowIdx: number) => void = () =>
 		console.log('Not implemented. Register onInvalidWord handler with add registerEvents method');
 	private onValidWord: (result: LetterIndicator[], keyIndicators: KeyIndicator) => void = () =>
 		console.log('not implemented.Register onValidWord handler with add registerEvents method');
@@ -49,7 +43,11 @@ export class WordBoard {
 		this.setupBoard();
 	}
 
-	registerEvents(obj: RegisterEventsProps): void {
+	registerEvents(obj: {
+		onValidWord: (result, keyInd) => void;
+		onGameCompleted: (result: boolean, word: string) => void;
+		onInvalidWord: (word, rowIdx) => void;
+	}): void {
 		if (typeof obj.onValidWord === 'function') {
 			this.onValidWord = obj.onValidWord;
 		}
@@ -71,14 +69,6 @@ export class WordBoard {
 			return;
 
 			// Game Completed
-		} else if (this.isGameCompleted()) {
-			if (key === this.SUBMIT_KEY) {
-				this.submitWord();
-				const indicators = this.getIndicatorsForCurrentRow();
-				this.onValidWord(indicators, this.keyIndicators);
-				this.onGameCompleted(WordBoard.isCorrectAnswer(indicators), this.solutionWord);
-				this.gameEnded = true;
-			}
 		} else if (this.isRowCompleted()) {
 			if (key === this.SUBMIT_KEY) {
 				const word = this.boardState.boardState[this.currentRowIdx].join('');
@@ -89,13 +79,15 @@ export class WordBoard {
 					const rowIndicators = this.getIndicatorsForCurrentRow();
 					this.onValidWord(rowIndicators, this.keyIndicators);
 
-					if (WordBoard.isCorrectAnswer(rowIndicators)) {
+					if (WordBoard.isCorrectAnswer(rowIndicators) || this.isGameCompleted()) {
 						this.onGameCompleted(WordBoard.isCorrectAnswer(rowIndicators), this.solutionWord);
 						this.gameEnded = true;
+						return;
 					}
+
 					this.startNewRow();
 				} else {
-					this.onInvalidWord();
+					this.onInvalidWord(word, this.currentRowIdx);
 				}
 			} else if (key == this.BACKSPACE_KEY) {
 				this.deleteLastLetter();

@@ -11,6 +11,7 @@
 	type UiState = 'idle' | 'fail' | 'won';
 	let uiState: UiState = 'idle';
 	let solution = '';
+	let showInvalidWord = false;
 
 	function handleStartNew() {
 		uiState = 'idle';
@@ -27,6 +28,11 @@
 		solution = word;
 		uiState = status;
 	}
+
+	function handleInvalidWord(e) {
+		showInvalidWord = true;
+		console.log('triggered invalid word', e.detail);
+	}
 </script>
 
 <main class="flex flex-col md:h-screen pb-4 max-w-md m-auto">
@@ -36,7 +42,12 @@
 		</Header>
 	</div>
 	<div class="flex-1 pl-4 pr-4">
-		<GameBoard bind:getHint bind:startNewGame on:result={handleResult} />
+		<GameBoard
+			bind:getHint
+			bind:startNewGame
+			on:result={handleResult}
+			on:invalidWord={handleInvalidWord}
+		/>
 	</div>
 	{#if uiState === 'fail'}
 		<WrongWord on:click={handleStartNew}>

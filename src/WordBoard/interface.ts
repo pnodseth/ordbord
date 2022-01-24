@@ -13,7 +13,7 @@ export interface BoardState {
 
 export interface RegisterEventsProps {
 	onValidWord?: (result: LetterIndicator[], keyIndicators: KeyIndicator) => void;
-	onInvalidWord?: () => void;
+	onInvalidWord?: (word: string, roxIdx: number) => void;
 	onGameCompleted?: (correct: boolean, word: string) => void;
 }
 

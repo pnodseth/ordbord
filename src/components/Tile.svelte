@@ -5,7 +5,6 @@
 	export let row: number;
 	export let entered: string[][] = [];
 	export let indicators: LetterIndicator[];
-
 	let tileText: string;
 	let indicator: LetterIndicator;
 

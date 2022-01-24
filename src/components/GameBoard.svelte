@@ -13,6 +13,7 @@
 	let inputsDisabled = false;
 	let rowIndicators: LetterIndicator[][] = [];
 	let keyIndicators: KeyIndicator = {};
+	let displayInvalidRow: number;
 	const numberOfLetters = 5;
 	export let game: WordBoard;
 	let boardState: BoardState;
@@ -32,8 +33,12 @@
 		boardState = game.getBoardState();
 
 		game.registerEvents({
-			onInvalidWord: () => {
-				console.log('triggered invalid word');
+			onInvalidWord: (word, rowIdx) => {
+				console.log('triggered invalid word', rowIdx);
+				displayInvalidRow = rowIdx;
+				setTimeout(() => {
+					displayInvalidRow = null;
+				}, 500);
 			},
 			onValidWord: (result, keyInd) => {
 				rowIndicators.push(result);
@@ -84,6 +89,7 @@
 					entered={boardState.boardState}
 					submissions={boardState.submitted}
 					indicators={rowIndicators}
+					{displayInvalidRow}
 				/>
 			{/each}
 			<div class="h-4" />
