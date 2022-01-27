@@ -4,8 +4,10 @@
 	import WrongWord from '../components/Modals/WrongWord.svelte';
 	import { onMount } from 'svelte';
 	import Won from '../components/Modals/Won.svelte';
+	import Explanation from '../components/Modals/Explanation.svelte';
 
 	let getHint: () => void;
+	let showExplanation = false;
 
 	let startNewGame: (wordLength: number, rows: number, solution?: string) => void;
 	type UiState = 'idle' | 'fail' | 'won';
@@ -19,6 +21,11 @@
 
 	onMount(() => {
 		startNewGame(5, 6);
+		const shown = localStorage.getItem('explanation');
+		if (!shown) {
+			showExplanation = true;
+			localStorage.setItem('explanation', JSON.stringify(true));
+		}
 	});
 
 	function handleResult(e) {
@@ -30,6 +37,9 @@
 </script>
 
 <main class="flex flex-col md:h-screen pb-4 max-w-md m-auto">
+	{#if showExplanation}
+		<Explanation on:click={() => (showExplanation = false)} />
+	{/if}
 	<div class="h-16  mb-4 md:mb-12  flex flex-initial">
 		<Header>
 			<button on:click={getHint}>Click</button>
