@@ -212,24 +212,46 @@ export class WordBoard {
 	}
 
 	private getIndicatorsForCurrentRow(): LetterIndicator[] {
-		const letterArr = this.boardState.boardState[this.currentRowIdx];
+		const letterArr = [...this.boardState.boardState[this.currentRowIdx]];
+		const solutionCopy = [...this.solutionWord];
 
 		const result: LetterIndicator[] = [];
+		/*
+		 * Avgitt : koker
+		 * Riktig ord: koser
+		 * På K nr to: Dersom antallet
+		 * */
 
-		for (let i = 0; i < letterArr.length; i++) {
+		/*Check for green letters*/
+		for (let i = 0; i < this.solutionWord.length; i++) {
 			const char = letterArr[i];
-
-			if (char === this.solutionWord[i]) {
-				result.push('correct');
+			if (char && char === solutionCopy[i]) {
+				result[i] = 'correct';
 				this.keyIndicators[char] = 'correct';
-			} else if (this.solutionWord.includes(char)) {
-				result.push('present');
-				this.keyIndicators[char] = 'present';
-			} else {
-				result.push('notPresent');
-				this.keyIndicators[char] = 'notPresent';
+
+				letterArr[i] = undefined;
+				solutionCopy[i] = undefined;
 			}
 		}
+
+		/*Check for yellow letters*/
+		for (let i = 0; i < this.solutionWord.length; i++) {
+			const char = letterArr[i];
+			if (char && solutionCopy.includes(char)) {
+				result[i] = 'present';
+				this.keyIndicators[char] = 'correct';
+				letterArr[i] = undefined;
+				solutionCopy[i] = undefined;
+			}
+		}
+		/* Not present letters*/
+		for (let i = 0; i < this.solutionWord.length; i++) {
+			const char = letterArr[i];
+			if (char) {
+				result[i] = 'notPresent';
+			}
+		}
+
 		return result;
 	}
 

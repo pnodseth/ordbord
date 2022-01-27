@@ -25,7 +25,7 @@
 	class:present={indicator === 'present'}
 	class:not-present={indicator === 'notPresent'}
 >
-	{tileText.toUpperCase()}
+	{tileText?.toUpperCase()}
 </p>
 
 <style>
