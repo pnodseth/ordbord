@@ -239,7 +239,7 @@ export class WordBoard {
 			const char = letterArr[i];
 			if (char && solutionCopy.includes(char)) {
 				result[i] = 'present';
-				this.keyIndicators[char] = 'correct';
+				this.keyIndicators[char] = 'present';
 				letterArr[i] = undefined;
 				solutionCopy[i] = undefined;
 			}
@@ -249,6 +249,7 @@ export class WordBoard {
 			const char = letterArr[i];
 			if (char) {
 				result[i] = 'notPresent';
+				this.keyIndicators[char] = 'notPresent';
 			}
 		}
 
