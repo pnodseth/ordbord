@@ -270,13 +270,4 @@ export class WordBoard {
 	getHint(): string {
 		return this.solutionWord[this.currentTileIdx];
 	}
-
-	static getRandomWord(length: number): string {
-		if (length < 3 || length > 8) {
-			throw new Error('Word must be between 3 and 8 letters');
-		} else {
-			const rnd = Math.floor(Math.random() * (dictionary[length.toString()].length - 1));
-			return dictionary[length.toString()][rnd];
-		}
-	}
 }
