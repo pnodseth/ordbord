@@ -1,5 +1,6 @@
 import type { BoardState, Config, KeyIndicator, LetterIndicator } from './interface';
 import dictionary from './filtered.json';
+import solutions from './solutions.json';
 
 export class WordBoard {
 	private numberOfTiles = 5;
@@ -22,9 +23,11 @@ export class WordBoard {
 			'not implemented.Register onGameCompleted event handler with add registerEvents method'
 		);
 	private keyIndicators: KeyIndicator = {};
+	private solutions: string[];
 
 	constructor(config: Config) {
 		this.dict = dictionary[config.tiles.toString()];
+		this.solutions = solutions;
 
 		if (!config.solution || config.solution === '') {
 			this.setRandomWord();
@@ -263,8 +266,8 @@ export class WordBoard {
 	}
 
 	setRandomWord(): void {
-		const rnd = Math.floor(Math.random() * (this.dict.length - 1) + 1);
-		this.solutionWord = this.dict[rnd];
+		const rnd = Math.floor(Math.random() * (this.solutions.length - 1) + 1);
+		this.solutionWord = this.solutions[rnd];
 	}
 
 	getHint(): string {
