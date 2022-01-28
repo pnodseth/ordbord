@@ -20,7 +20,7 @@
 	}
 
 	onMount(() => {
-		startNewGame(5, 6, 'start');
+		startNewGame(5, 6);
 		const shown = localStorage.getItem('explanation');
 		if (!shown) {
 			showExplanation = true;
