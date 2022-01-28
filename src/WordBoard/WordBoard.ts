@@ -249,7 +249,9 @@ export class WordBoard {
 			const char = letterArr[i];
 			if (char) {
 				result[i] = 'notPresent';
-				this.keyIndicators[char] = 'notPresent';
+				if (!this.keyIndicators[char]) {
+					this.keyIndicators[char] = 'notPresent';
+				}
 			}
 		}
 
