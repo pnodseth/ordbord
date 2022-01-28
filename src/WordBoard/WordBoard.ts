@@ -244,7 +244,7 @@ export class WordBoard {
 				result[i] = 'present';
 				this.keyIndicators[char] = 'present';
 				letterArr[i] = undefined;
-				solutionCopy[i] = undefined;
+				solutionCopy[solutionCopy.indexOf(char)] = undefined;
 			}
 		}
 		/* Not present letters*/
