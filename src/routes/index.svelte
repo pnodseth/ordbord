@@ -36,7 +36,7 @@
 	}
 </script>
 
-<main class="flex flex-col h-screen pb-4 max-w-md m-auto ">
+<main class="flex flex-col h-screen pb-4 max-w-md m-auto pb-4">
 	{#if showExplanation}
 		<Explanation on:click={() => (showExplanation = false)} />
 	{/if}
