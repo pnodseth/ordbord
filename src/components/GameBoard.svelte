@@ -24,12 +24,12 @@
 		boardState = undefined;
 	}
 
-	export function startNewGame(wordLength: number, rows: number, solution?: string): void {
+	export function startNewGame(wordLength: number, rows: number, wordIdx: number): void {
 		resetState();
 		game = new WordBoard({
 			tiles: wordLength,
 			rows: rows,
-			solution: solution || null
+			wordIdx
 		});
 		boardState = game.getBoardState();
 
@@ -45,7 +45,13 @@
 				keyIndicators = keyInd;
 			},
 			onGameCompleted: (result: boolean, word: string) => {
-				dispatch('result', { status: result === false ? 'fail' : 'won', word });
+				console.log(this);
+				dispatch('result', {
+					status: result === false ? 'fail' : 'won',
+					word,
+					rowIndicators: rowIndicators,
+					boardState
+				});
 			}
 		});
 		tilesArr = Array.from({ length: numberOfLetters }, (x, i) => i);
@@ -67,11 +73,6 @@
 
 	function handleKeyboardInput(e) {
 		handleInput(e.key);
-	}
-
-	export function getHint(): void {
-		const letter = game.getHint();
-		handleInput(letter);
 	}
 </script>
 

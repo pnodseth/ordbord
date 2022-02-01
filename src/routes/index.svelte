@@ -5,34 +5,109 @@
 	import { onMount } from 'svelte';
 	import Won from '../components/Modals/Won.svelte';
 	import Explanation from '../components/Modals/Explanation.svelte';
+	import type { BoardState, LetterIndicator } from '../WordBoard/interface';
+	import differenceInDays from 'date-fns/differenceInDays';
+
+	interface Result {
+		wordIdx: number;
+		rowIndicators: LetterIndicator[][];
+		state: UiState;
+		boardState: BoardState;
+	}
 
 	let getHint: () => void;
 	let showExplanation = false;
-
-	let startNewGame: (wordLength: number, rows: number, solution?: string) => void;
+	let rowIndicators: LetterIndicator[][];
+	let startNewGame: (wordLength: number, rows: number, wordIdx: number) => void;
 	type UiState = 'idle' | 'fail' | 'won';
 	let uiState: UiState = 'idle';
 	let solution = '';
+	const firstDate = new Date(2022, 0, 31);
+	const today = new Date();
+	const wordIdx = differenceInDays(today, firstDate);
+	let cachedResults: Result[] = [];
+
+	let showWonModal = false;
 
 	function handleStartNew() {
 		uiState = 'idle';
-		startNewGame(5, 6);
+		startNewGame(5, 6, wordIdx);
 	}
 
 	onMount(() => {
-		startNewGame(5, 6);
+		// First, check if we have a cached result for today:
+
+		startNewGame(5, 6, wordIdx);
 		const shown = localStorage.getItem('explanation');
 		if (!shown) {
 			showExplanation = true;
 			localStorage.setItem('explanation', JSON.stringify(true));
 		}
+
+		const cachedResultsString = localStorage.getItem('results');
+		if (cachedResultsString) {
+			cachedResults = JSON.parse(cachedResultsString);
+			const resultToday = cachedResults.find((e) => e.wordIdx === wordIdx);
+			if (resultToday) {
+				rowIndicators = resultToday.rowIndicators;
+				uiState = resultToday.state;
+			}
+		}
 	});
 
 	function handleResult(e) {
-		const { status, word } = e.detail;
+		const { status, word, rowIndicators: indicators, boardState } = e.detail;
 
 		solution = word;
 		uiState = status;
+		rowIndicators = indicators;
+		showWonModal = status === 'won' ? true : false;
+
+		const result: Result = { rowIndicators, state: status, wordIdx, boardState };
+		cachedResults.push(result);
+		localStorage.setItem('results', JSON.stringify(cachedResults));
+	}
+
+	function parseIndicators() {
+		if (rowIndicators) {
+			let output = `Ordbord ${wordIdx} ${uiState === 'won' ? rowIndicators.length : 'X'}/6\n`;
+			rowIndicators.forEach((rowArr, idx) => {
+				if (idx !== 0) {
+					output += '\n';
+				}
+				rowArr.forEach((letter) => {
+					switch (letter) {
+						case 'notPresent':
+							output += '⬜';
+							break;
+						case 'present':
+							output += '🟨';
+							break;
+						case 'correct':
+							output += '🟩';
+							break;
+					}
+				});
+			});
+
+			return output;
+		}
+	}
+
+	function updateClipboard() {
+		let shareResult = parseIndicators();
+		console.log(shareResult);
+
+		navigator.permissions
+			// eslint-disable-next-line no-undef
+			.query(<PermissionDescriptor>{ name: 'clipboard-write' })
+			.then((result) => {
+				if (result.state == 'granted' || result.state == 'prompt') {
+					/* write to the clipboard now */
+				}
+			});
+
+		navigator.clipboard.writeText(shareResult);
 	}
 </script>
 
@@ -49,11 +124,11 @@
 		<GameBoard bind:getHint bind:startNewGame on:result={handleResult} />
 	</div>
 	{#if uiState === 'fail'}
-		<WrongWord on:click={handleStartNew}>
+		<WrongWord on:click={handleStartNew} on:share={updateClipboard}>
 			<p>Riktig ord: {solution.toUpperCase()}</p>
 		</WrongWord>
 	{/if}
-	{#if uiState === 'won'}
-		<Won on:click={handleStartNew}><p>Gratulerer!</p></Won>
+	{#if showWonModal}
+		<Won on:click={handleStartNew} on:share={updateClipboard}><p>Gratulerer!</p></Won>
 	{/if}
 </main>

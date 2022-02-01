@@ -18,7 +18,11 @@ export class WordBoard {
 		console.log('Not implemented. Register onInvalidWord handler with add registerEvents method');
 	private onValidWord: (result: LetterIndicator[], keyIndicators: KeyIndicator) => void = () =>
 		console.log('not implemented.Register onValidWord handler with add registerEvents method');
-	private onGameCompleted: (correct: boolean, word: string) => void = () =>
+	private onGameCompleted: (
+		correct: boolean,
+		word: string,
+		indicatorRow: LetterIndicator[]
+	) => void = () =>
 		console.log(
 			'not implemented.Register onGameCompleted event handler with add registerEvents method'
 		);
@@ -29,10 +33,11 @@ export class WordBoard {
 		this.dict = dictionary[config.tiles.toString()];
 		this.solutions = solutions;
 
-		if (!config.solution || config.solution === '') {
+		if (typeof config.wordIdx === 'undefined' || config.wordIdx === null) {
 			this.setRandomWord();
 		} else {
-			this.solutionWord = config.solution;
+			this.solutionWord = this.solutions[config.wordIdx];
+			console.log(`solution is ${this.solutionWord}`);
 		}
 		this.numberOfTiles = config.tiles;
 		this.numberOfRows = config.rows;
@@ -48,7 +53,7 @@ export class WordBoard {
 
 	registerEvents(obj: {
 		onValidWord: (result, keyInd) => void;
-		onGameCompleted: (result: boolean, word: string) => void;
+		onGameCompleted: (result: boolean, word: string, indicatorRow: LetterIndicator[]) => void;
 		onInvalidWord: (word, rowIdx) => void;
 	}): void {
 		if (typeof obj.onValidWord === 'function') {
@@ -84,7 +89,11 @@ export class WordBoard {
 					this.onValidWord(rowIndicators, this.keyIndicators);
 
 					if (WordBoard.isCorrectAnswer(rowIndicators) || this.isGameCompleted()) {
-						this.onGameCompleted(WordBoard.isCorrectAnswer(rowIndicators), this.solutionWord);
+						this.onGameCompleted(
+							WordBoard.isCorrectAnswer(rowIndicators),
+							this.solutionWord,
+							rowIndicators
+						);
 						this.gameEnded = true;
 					}
 
