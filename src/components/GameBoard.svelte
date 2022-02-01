@@ -4,7 +4,7 @@
 	import Keyboard from './Keyboard.svelte';
 	import { WordBoard } from '../WordBoard/WordBoard';
 	import type { BoardState, KeyIndicator, LetterIndicator } from '../WordBoard/interface';
-	import differenceInDays from 'date-fns/differenceInDays';
+	import differenceInDays from 'date-fns/differenceInDays/index.js';
 	import { onMount } from 'svelte';
 	import WrongWord from './Modals/WrongWord.svelte';
 	import Won from './Modals/Won.svelte';
