@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Modal from '../Modal.svelte';
-	import { createEventDispatcher } from 'svelte';
 	import type { UiState } from '../../WordBoard/interface';
 
 	type CopyState = 'idle' | 'copying' | 'copied' | 'error';
@@ -64,7 +63,7 @@
 		{#if uiState === 'fail'}
 			<p>Riktig ord: {solution.toUpperCase()}</p>
 		{:else}
-			<p>Gratulerer!!!!</p>
+			<p>Gratulerer!</p>
 		{/if}
 		<div class="h-4 mb-4" />
 		{#if copyState === 'copied'}
