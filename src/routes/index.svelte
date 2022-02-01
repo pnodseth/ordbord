@@ -3,7 +3,7 @@
 	import Header from '../components/Header.svelte';
 	import { onMount } from 'svelte';
 	import Explanation from '../components/Modals/Explanation.svelte';
-	import differenceInDays from 'date-fns/differenceInDays/index';
+	import differenceInDays from 'date-fns/differenceInDays/index.js';
 
 	let showExplanation = false;
 	const firstDate = new Date(2022, 0, 31);
