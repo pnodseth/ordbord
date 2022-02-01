@@ -23,3 +23,14 @@ export interface KeyIndicator {
 }
 
 export type LetterIndicator = 'notPresent' | 'present' | 'correct';
+
+export interface Result {
+	wordIdx: number;
+	rowIndicators: LetterIndicator[][];
+	state: UiState;
+	boardState: BoardState;
+	keyIndicators: KeyIndicator;
+	solution: string;
+}
+
+export type UiState = 'idle' | 'fail' | 'won';

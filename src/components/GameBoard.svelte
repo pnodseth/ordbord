@@ -3,21 +3,17 @@
 	import Row from './Row.svelte';
 	import Keyboard from './Keyboard.svelte';
 	import { WordBoard } from '../WordBoard/WordBoard';
-	import type { BoardState, KeyIndicator, LetterIndicator } from '../WordBoard/interface';
+	import type {
+		BoardState,
+		KeyIndicator,
+		LetterIndicator,
+		Result,
+		UiState
+	} from '../WordBoard/interface';
 	import differenceInDays from 'date-fns/differenceInDays/index.js';
 	import { onMount } from 'svelte';
-	import WrongWord from './Modals/WrongWord.svelte';
 	import Won from './Modals/Won.svelte';
 
-	interface Result {
-		wordIdx: number;
-		rowIndicators: LetterIndicator[][];
-		state: UiState;
-		boardState: BoardState;
-		keyIndicators: KeyIndicator;
-		solution: string;
-	}
-	type UiState = 'idle' | 'fail' | 'won';
 	/*FROM INDEX COMPONENT*/
 	let uiState: UiState = 'idle';
 	let solution = '';
@@ -145,47 +141,6 @@
 			handleInput(e.key);
 		}
 	}
-
-	function parseIndicators() {
-		if (rowIndicators) {
-			let output = `Ordbord ${wordIdx} ${uiState === 'won' ? rowIndicators.length : 'X'}/6\n`;
-			rowIndicators.forEach((rowArr, idx) => {
-				if (idx !== 0) {
-					output += '\n';
-				}
-				rowArr.forEach((letter) => {
-					switch (letter) {
-						case 'notPresent':
-							output += '⬜';
-							break;
-						case 'present':
-							output += '🟨';
-							break;
-						case 'correct':
-							output += '🟩';
-							break;
-					}
-				});
-			});
-
-			return output;
-		}
-	}
-
-	function updateClipboard() {
-		let shareResult = parseIndicators();
-
-		navigator.permissions
-			// eslint-disable-next-line no-undef
-			.query(<PermissionDescriptor>{ name: 'clipboard-write' })
-			.then((result) => {
-				if (result.state == 'granted' || result.state == 'prompt') {
-					/* write to the clipboard now */
-				}
-			});
-
-		navigator.clipboard.writeText(shareResult);
-	}
 </script>
 
 <svelte:body on:keyup={handleKeyboardInput} />
@@ -208,13 +163,8 @@
 			<div class="h-4" />
 		</div>
 		<Keyboard on:tap={handleTap} {keyIndicators} />
-		{#if uiState === 'fail' && showWonModal}
-			<WrongWord on:share={updateClipboard} on:close={() => (showWonModal = false)}>
-				<p>Riktig ord: {solution.toUpperCase()}</p>
-			</WrongWord>
-		{/if}
-		{#if uiState === 'won' && showWonModal}
-			<Won on:share={updateClipboard}><p>Gratulerer!</p></Won>
+		{#if uiState !== 'idle' && showWonModal}
+			<Won on:close={() => (showWonModal = false)} {uiState} {solution} {rowIndicators} {wordIdx} />
 		{/if}
 	</section>
 {/if}
