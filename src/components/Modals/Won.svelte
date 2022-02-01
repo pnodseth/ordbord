@@ -3,7 +3,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import type { UiState } from '../../WordBoard/interface';
 
-	type CopyState = 'idle' | 'copying' | 'copied';
+	type CopyState = 'idle' | 'copying' | 'copied' | 'error';
 	let copyState: CopyState = 'idle';
 	export let uiState: UiState;
 	export let solution = '';
@@ -51,7 +51,9 @@
 				console.log(`"${shareResult}" was copied to clipboard.`);
 			})
 			.catch((err) => {
+				copyState = 'error';
 				console.error(`Error copying text to clipboard: ${shareResult}`);
+
 				console.log(err);
 			});
 	}
@@ -73,6 +75,8 @@
 				class="bg-gray-500 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded"
 				>Del resultat</button
 			>
+		{:else if copyState === 'error'}
+			<p>Det var et problem med å kopiere resultatet.</p>
 		{:else}
 			<p>Kopierer...</p>
 		{/if}
