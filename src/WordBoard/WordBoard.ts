@@ -37,7 +37,6 @@ export class WordBoard {
 			this.setRandomWord();
 		} else {
 			this.solutionWord = this.solutions[config.wordIdx];
-			console.log(`solution is ${this.solutionWord}`);
 		}
 		this.numberOfTiles = config.tiles;
 		this.numberOfRows = config.rows;

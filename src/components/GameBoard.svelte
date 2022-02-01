@@ -4,9 +4,31 @@
 	import Keyboard from './Keyboard.svelte';
 	import { WordBoard } from '../WordBoard/WordBoard';
 	import type { BoardState, KeyIndicator, LetterIndicator } from '../WordBoard/interface';
-	import { createEventDispatcher } from 'svelte';
+	import differenceInDays from 'date-fns/differenceInDays';
+	import { onMount } from 'svelte';
+	import WrongWord from './Modals/WrongWord.svelte';
+	import Won from './Modals/Won.svelte';
 
-	const dispatch = createEventDispatcher();
+	interface Result {
+		wordIdx: number;
+		rowIndicators: LetterIndicator[][];
+		state: UiState;
+		boardState: BoardState;
+		keyIndicators: KeyIndicator;
+		solution: string;
+	}
+	type UiState = 'idle' | 'fail' | 'won';
+	/*FROM INDEX COMPONENT*/
+	let uiState: UiState = 'idle';
+	let solution = '';
+	const firstDate = new Date(2022, 0, 31);
+	const today = new Date();
+	const wordIdx = differenceInDays(today, firstDate);
+	let cachedResults: Result[] = [];
+	let showWonModal = false;
+
+	/**/
+
 	let tilesArr = [];
 	let rowsArr = [];
 	let rowsCount = 6;
@@ -15,8 +37,29 @@
 	let keyIndicators: KeyIndicator = {};
 	let displayInvalidRow: number;
 	const numberOfLetters = 5;
-	export let game: WordBoard;
+	let game: WordBoard;
 	let boardState: BoardState;
+
+	onMount(() => {
+		// First, check if we have a cached result for today:
+		const cachedResultsString = localStorage.getItem('results');
+		if (cachedResultsString) {
+			cachedResults = JSON.parse(cachedResultsString);
+			const resultToday = cachedResults.find((e) => e.wordIdx === wordIdx);
+			if (resultToday) {
+				rowIndicators = resultToday.rowIndicators;
+				uiState = resultToday.state;
+				boardState = resultToday.boardState;
+				keyIndicators = resultToday.keyIndicators;
+				solution = resultToday.solution;
+
+				if (uiState !== 'idle') {
+					showWonModal = true;
+				}
+			}
+		}
+		startNewGame(5, 6, wordIdx, boardState, rowIndicators, keyIndicators);
+	});
 
 	function resetState() {
 		rowIndicators = [];
@@ -24,7 +67,7 @@
 		boardState = undefined;
 	}
 
-	export function startNewGame(
+	function startNewGame(
 		wordLength: number,
 		rows: number,
 		wordIdx: number,
@@ -45,7 +88,6 @@
 		});
 
 		boardState = game.getBoardState();
-		console.log({ boardState }, boardState);
 
 		game.registerEvents({
 			onInvalidWord: (word, rowIdx) => {
@@ -59,19 +101,29 @@
 				keyIndicators = keyInd;
 			},
 			onGameCompleted: (result: boolean, word: string) => {
-				console.log(this);
-				dispatch('result', {
-					status: result === false ? 'fail' : 'won',
-					word,
-					rowIndicators: rowIndicators,
-					boardState,
-					kIndicators: keyIndicators
-				});
+				handleResult(result, word);
 			}
 		});
 
 		tilesArr = Array.from({ length: numberOfLetters }, (x, i) => i);
 		rowsArr = Array.from({ length: rowsCount }, (x, i) => i);
+	}
+
+	function handleResult(won: boolean, word: string) {
+		solution = word;
+		uiState = won ? 'won' : 'fail';
+		showWonModal = true;
+
+		const result: Result = {
+			boardState,
+			keyIndicators,
+			rowIndicators,
+			state: uiState,
+			wordIdx,
+			solution: solution
+		};
+		cachedResults.push(result);
+		localStorage.setItem('results', JSON.stringify(cachedResults));
 	}
 
 	function handleInput(key) {
@@ -81,14 +133,58 @@
 		}
 	}
 	function handleTap(e) {
-		if (inputsDisabled) {
+		if (inputsDisabled || uiState !== 'idle') {
 			return;
 		}
+
 		handleInput(e.detail);
 	}
 
 	function handleKeyboardInput(e) {
-		handleInput(e.key);
+		if (uiState === 'idle') {
+			handleInput(e.key);
+		}
+	}
+
+	function parseIndicators() {
+		if (rowIndicators) {
+			let output = `Ordbord ${wordIdx} ${uiState === 'won' ? rowIndicators.length : 'X'}/6\n`;
+			rowIndicators.forEach((rowArr, idx) => {
+				if (idx !== 0) {
+					output += '\n';
+				}
+				rowArr.forEach((letter) => {
+					switch (letter) {
+						case 'notPresent':
+							output += '⬜';
+							break;
+						case 'present':
+							output += '🟨';
+							break;
+						case 'correct':
+							output += '🟩';
+							break;
+					}
+				});
+			});
+
+			return output;
+		}
+	}
+
+	function updateClipboard() {
+		let shareResult = parseIndicators();
+
+		navigator.permissions
+			// eslint-disable-next-line no-undef
+			.query(<PermissionDescriptor>{ name: 'clipboard-write' })
+			.then((result) => {
+				if (result.state == 'granted' || result.state == 'prompt') {
+					/* write to the clipboard now */
+				}
+			});
+
+		navigator.clipboard.writeText(shareResult);
 	}
 </script>
 
@@ -112,5 +208,13 @@
 			<div class="h-4" />
 		</div>
 		<Keyboard on:tap={handleTap} {keyIndicators} />
+		{#if uiState === 'fail' && showWonModal}
+			<WrongWord on:share={updateClipboard} on:close={() => (showWonModal = false)}>
+				<p>Riktig ord: {solution.toUpperCase()}</p>
+			</WrongWord>
+		{/if}
+		{#if uiState === 'won' && showWonModal}
+			<Won on:share={updateClipboard}><p>Gratulerer!</p></Won>
+		{/if}
 	</section>
 {/if}
