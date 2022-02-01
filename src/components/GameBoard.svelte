@@ -24,14 +24,28 @@
 		boardState = undefined;
 	}
 
-	export function startNewGame(wordLength: number, rows: number, wordIdx: number): void {
+	export function startNewGame(
+		wordLength: number,
+		rows: number,
+		wordIdx: number,
+		initialBoardState: BoardState,
+		indicators: LetterIndicator[][],
+		kIndicators: KeyIndicator
+	): void {
 		resetState();
+
+		rowIndicators = indicators;
+		keyIndicators = kIndicators;
+
 		game = new WordBoard({
 			tiles: wordLength,
 			rows: rows,
-			wordIdx
+			wordIdx,
+			boardState: initialBoardState
 		});
+
 		boardState = game.getBoardState();
+		console.log({ boardState }, boardState);
 
 		game.registerEvents({
 			onInvalidWord: (word, rowIdx) => {
@@ -50,10 +64,12 @@
 					status: result === false ? 'fail' : 'won',
 					word,
 					rowIndicators: rowIndicators,
-					boardState
+					boardState,
+					kIndicators: keyIndicators
 				});
 			}
 		});
+
 		tilesArr = Array.from({ length: numberOfLetters }, (x, i) => i);
 		rowsArr = Array.from({ length: rowsCount }, (x, i) => i);
 	}

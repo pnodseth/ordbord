@@ -29,7 +29,7 @@ export class WordBoard {
 	private keyIndicators: KeyIndicator = {};
 	private solutions: string[];
 
-	constructor(config: Config) {
+	constructor(config: { tiles: number; boardState: BoardState; wordIdx: number; rows: number }) {
 		this.dict = dictionary[config.tiles.toString()];
 		this.solutions = solutions;
 
@@ -41,14 +41,16 @@ export class WordBoard {
 		}
 		this.numberOfTiles = config.tiles;
 		this.numberOfRows = config.rows;
-		if (config.submitKey) this.SUBMIT_KEY = config.submitKey;
-		if (config.backKey) this.BACKSPACE_KEY = config.backKey;
 
 		/*if (this.solutionWord.length !== config.tiles) {
 			throw Error('Solution word must have same amount of characters as config.');
 		}*/
 
-		this.setupBoard();
+		if (config.boardState) {
+			this.boardState = config.boardState;
+		} else {
+			this.setupBoard();
+		}
 	}
 
 	registerEvents(obj: {

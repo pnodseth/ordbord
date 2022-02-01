@@ -5,7 +5,7 @@
 	import { onMount } from 'svelte';
 	import Won from '../components/Modals/Won.svelte';
 	import Explanation from '../components/Modals/Explanation.svelte';
-	import type { BoardState, LetterIndicator } from '../WordBoard/interface';
+	import type { BoardState, KeyIndicator, LetterIndicator } from '../WordBoard/interface';
 	import differenceInDays from 'date-fns/differenceInDays';
 
 	interface Result {
@@ -13,12 +13,20 @@
 		rowIndicators: LetterIndicator[][];
 		state: UiState;
 		boardState: BoardState;
+		keyIndicators: KeyIndicator;
 	}
 
 	let getHint: () => void;
 	let showExplanation = false;
-	let rowIndicators: LetterIndicator[][];
-	let startNewGame: (wordLength: number, rows: number, wordIdx: number) => void;
+	let rowIndicators: LetterIndicator[][] = [];
+	let startNewGame: (
+		wordLength: number,
+		rows: number,
+		wordIdx: number,
+		initialBoardState: BoardState | null,
+		rowIndicators: LetterIndicator[][],
+		keyIndicators: KeyIndicator
+	) => void;
 	type UiState = 'idle' | 'fail' | 'won';
 	let uiState: UiState = 'idle';
 	let solution = '';
@@ -26,24 +34,18 @@
 	const today = new Date();
 	const wordIdx = differenceInDays(today, firstDate);
 	let cachedResults: Result[] = [];
+	let initialBoardState: BoardState;
+	let initialKeyIndicators: KeyIndicator;
 
 	let showWonModal = false;
 
 	function handleStartNew() {
 		uiState = 'idle';
-		startNewGame(5, 6, wordIdx);
+		startNewGame(5, 6, wordIdx, initialBoardState, rowIndicators, initialKeyIndicators);
 	}
 
 	onMount(() => {
 		// First, check if we have a cached result for today:
-
-		startNewGame(5, 6, wordIdx);
-		const shown = localStorage.getItem('explanation');
-		if (!shown) {
-			showExplanation = true;
-			localStorage.setItem('explanation', JSON.stringify(true));
-		}
-
 		const cachedResultsString = localStorage.getItem('results');
 		if (cachedResultsString) {
 			cachedResults = JSON.parse(cachedResultsString);
@@ -51,19 +53,34 @@
 			if (resultToday) {
 				rowIndicators = resultToday.rowIndicators;
 				uiState = resultToday.state;
+				initialBoardState = resultToday.boardState;
+				initialKeyIndicators = resultToday.keyIndicators;
 			}
+		}
+		console.log({ initialBoardState }, initialBoardState);
+		startNewGame(5, 6, wordIdx, initialBoardState, rowIndicators, initialKeyIndicators);
+		const shown = localStorage.getItem('explanation');
+		if (!shown) {
+			showExplanation = true;
+			localStorage.setItem('explanation', JSON.stringify(true));
 		}
 	});
 
 	function handleResult(e) {
-		const { status, word, rowIndicators: indicators, boardState } = e.detail;
+		const { status, word, rowIndicators: indicators, boardState, kIndicators } = e.detail;
 
 		solution = word;
 		uiState = status;
 		rowIndicators = indicators;
 		showWonModal = status === 'won' ? true : false;
 
-		const result: Result = { rowIndicators, state: status, wordIdx, boardState };
+		const result: Result = {
+			rowIndicators,
+			state: status,
+			wordIdx,
+			boardState,
+			keyIndicators: kIndicators
+		};
 		cachedResults.push(result);
 		localStorage.setItem('results', JSON.stringify(cachedResults));
 	}

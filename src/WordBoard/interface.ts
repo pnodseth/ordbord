@@ -4,6 +4,7 @@ export interface Config {
 	submitKey?: string;
 	backKey?: string;
 	wordIdx: number;
+	boardState?: BoardState;
 }
 
 export interface BoardState {
