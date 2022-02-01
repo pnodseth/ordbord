@@ -3,8 +3,12 @@
 	import Header from '../components/Header.svelte';
 	import { onMount } from 'svelte';
 	import Explanation from '../components/Modals/Explanation.svelte';
+	import differenceInDays from 'date-fns/differenceInDays/index';
 
 	let showExplanation = false;
+	const firstDate = new Date(2022, 0, 31);
+	const today = new Date();
+	const wordIdx = differenceInDays(today, firstDate);
 
 	onMount(() => {
 		const shown = localStorage.getItem('explanation');
@@ -20,9 +24,9 @@
 		<Explanation on:click={() => (showExplanation = false)} />
 	{/if}
 	<div class="h-16  mb-4 md:mb-12  flex flex-initial">
-		<Header />
+		<Header {wordIdx} />
 	</div>
 	<div class="flex-1 pl-4 pr-4">
-		<GameBoard />
+		<GameBoard {wordIdx} />
 	</div>
 </main>

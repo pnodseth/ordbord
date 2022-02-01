@@ -10,20 +10,16 @@
 		Result,
 		UiState
 	} from '../WordBoard/interface';
-	import differenceInDays from 'date-fns/differenceInDays/index.js';
+
 	import { onMount } from 'svelte';
 	import Won from './Modals/Won.svelte';
 
-	/*FROM INDEX COMPONENT*/
+	export let wordIdx;
 	let uiState: UiState = 'idle';
 	let solution = '';
-	const firstDate = new Date(2022, 0, 31);
-	const today = new Date();
-	const wordIdx = differenceInDays(today, firstDate);
+
 	let cachedResults: Result[] = [];
 	let showWonModal = false;
-
-	/**/
 
 	let tilesArr = [];
 	let rowsArr = [];
