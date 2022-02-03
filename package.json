@@ -38,6 +38,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"date-fns": "^2.28.0"
+		"date-fns": "^2.28.0",
+		"postcss-100vh-fix": "^1.0.2"
 	}
 }

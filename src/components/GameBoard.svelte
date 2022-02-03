@@ -142,7 +142,7 @@
 <svelte:body on:keyup={handleKeyboardInput} />
 {#if boardState}
 	<section
-		class="flex flex-col h-full justify-between items-center md:pt-40"
+		class="flex flex-col h-full justify-between items-center xl:pt-40"
 		transition:fade={{ duration: 140 }}
 	>
 		<div id="board" class="font-bold h-96 w-full md:w-96 grid grid-rows-6 gap-0.5 overflow-hidden">
