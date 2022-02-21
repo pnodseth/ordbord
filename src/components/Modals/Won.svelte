@@ -39,22 +39,35 @@
 		}
 	}
 
-	function updateClipboard() {
+	async function updateClipboard() {
 		copyState === 'copying';
 		let shareResult = parseIndicators();
 
-		navigator.clipboard
-			.writeText(shareResult)
-			.then(() => {
-				copyState = 'copied';
-				console.log(`"${shareResult}" was copied to clipboard.`);
-			})
-			.catch((err) => {
-				copyState = 'error';
-				console.error(`Error copying text to clipboard: ${shareResult}`);
+		const shareData: ShareData = {
+			text: shareResult
+		};
 
-				console.log(err);
-			});
+		try {
+			// Try native share dialog
+			await navigator.share(shareData);
+		} catch (ex) {
+			// If not supported, copy to clipboard.
+
+			navigator.clipboard
+				.writeText(shareResult)
+				.then(() => {
+					copyState = 'copied';
+					console.log(`"${shareResult}" was copied to clipboard.`);
+				})
+				.catch((err) => {
+					copyState = 'error';
+					console.error(`Error copying text to clipboard: ${shareResult}`);
+
+					console.log(err);
+				});
+		}
+
+		/*;*/
 	}
 </script>
 
